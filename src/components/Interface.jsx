@@ -81,4 +81,4 @@ const FeatureCard = ({ icon, title, children, ...cardProps }) => {
 };
 
 
-export default { Typography, Card, CardBody, FeatureCard };
+export { Typography, Card, CardBody, FeatureCard };
