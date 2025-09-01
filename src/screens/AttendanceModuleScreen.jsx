@@ -1,42 +1,8 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Calendar, Search, Plus, Download, Clock, Users, TrendingUp, BarChart3, PieChart, Menu, X, ChevronDown, Filter } from 'lucide-react';
+import { useTeachers } from '../hooks/useTeachers';
+import { useAttendance } from '../hooks/useAttendance';
 
-// Mock hooks - replace with your actual implementations
-const useAttendance = () => ({
-  records: [
-    { id: 1, fullname: 'John Doe', department: 'Mathematics', checkInTime: '08:30', checkOutTime: '16:00', workHours: 7.5, status: 'present' },
-    { id: 2, fullname: 'Jane Smith', department: 'English', checkInTime: '09:00', checkOutTime: '15:30', workHours: 6.5, status: 'present' },
-    { id: 3, fullname: 'Mike Johnson', department: 'Science', checkInTime: null, checkOutTime: null, workHours: 0, status: 'absent' },
-  ],
-  loading: false,
-  error: null,
-  loadByDate: () => {},
-  saveRecord: () => {},
-  updateRecord: () => {},
-  stats: {
-    daily: {
-      totalRecords: 25,
-      presentCount: 22,
-      absentCount: 3,
-      lateCount: 5,
-      halfDayCount: 2,
-      avgWorkHours: 7.2
-    }
-  },
-  getWeekNumber: (date) => Math.ceil(new Date(date).getDate() / 7)
-});
-
-const useTeachers = () => ({
-  teachers: [
-    { id: 1, fullname: 'John Doe' },
-    { id: 2, fullname: 'Jane Smith' },
-    { id: 3, fullname: 'Mike Johnson' },
-  ]
-});
-
-const generatePdf = async (data, filters) => {
-  console.log('Generating PDF with data:', data, filters);
-};
 
 const Attendance = () => {
   const { records, loading, error, loadByDate, saveRecord, updateRecord, stats, getWeekNumber } = useAttendance();
