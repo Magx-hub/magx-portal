@@ -1,38 +1,19 @@
 import { useState, useCallback, useEffect } from 'react';
-
-// Mock data
-const mockTeachers = [
-  { id: 1, name: 'John Doe', department: 'Mathematics', experience: 10 },
-  { id: 2, name: 'Jane Smith', department: 'Science', experience: 8 },
-  { id: 3, name: 'Peter Jones', department: 'History', experience: 15 },
-  { id: 4, name: 'Mary Williams', department: 'English', experience: 5 },
-];
-
-const mockStats = {
-  totalTeachers: 4,
-  totalDepartments: 4,
-  departmentDistribution: [
-    { name: 'Mathematics', value: 1 },
-    { name: 'Science', value: 1 },
-    { name: 'History', value: 1 },
-    { name: 'English', value: 1 },
-  ],
-};
+import * as firebaseService from '../services/firebaseService';
 
 export const useTeachers = () => {
   const [teachers, setTeachers] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [stats, setStats] = useState({ totalTeachers: 0, totalDepartments: 0, departmentDistribution: [] });
+  const [stats, setStats] = useState({ totalTeachers: 0, totalDepartments: 0 });
 
   const handleAsync = useCallback(async (asyncFunction) => {
     setLoading(true);
     setError(null);
     try {
-      // Simulate async operation
-      return await new Promise(resolve => setTimeout(() => resolve(asyncFunction()), 500));
+      return await asyncFunction();
     } catch (err) {
-      console.error('Operation error:', err);
+      console.error('Database operation error:', err);
       setError(err.message || 'An error occurred');
       return null;
     } finally {
@@ -41,18 +22,16 @@ export const useTeachers = () => {
   }, []);
 
   const fetchTeachers = useCallback(async () => {
-    const data = await handleAsync(() => mockTeachers);
+    const data = await handleAsync(firebaseService.getTeachers);
     if (data) {
       setTeachers(data);
     }
   }, [handleAsync]);
 
   const addTeacher = useCallback(async (teacherData) => {
-    const newTeacherId = await handleAsync(() => {
-      const newTeacher = { ...teacherData, id: mockTeachers.length + 1 };
-      mockTeachers.push(newTeacher);
-      return newTeacher.id;
-    });
+    const newTeacherId = await handleAsync(() => 
+      firebaseService.addTeacher(teacherData)
+    );
     if (newTeacherId) {
       await fetchTeachers(); // Refresh the list
     }
@@ -60,14 +39,9 @@ export const useTeachers = () => {
   }, [handleAsync, fetchTeachers]);
 
   const updateTeacher = useCallback(async (id, teacherData) => {
-    const success = await handleAsync(() => {
-      const index = mockTeachers.findIndex(t => t.id === id);
-      if (index !== -1) {
-        mockTeachers[index] = { ...mockTeachers[index], ...teacherData };
-        return true;
-      }
-      return false;
-    });
+    const success = await handleAsync(() => 
+      firebaseService.updateTeacher(id, teacherData)
+    );
     if (success) {
       await fetchTeachers(); // Refresh the list
     }
@@ -75,14 +49,9 @@ export const useTeachers = () => {
   }, [handleAsync, fetchTeachers]);
 
   const deleteTeacher = useCallback(async (id) => {
-    const success = await handleAsync(() => {
-      const index = mockTeachers.findIndex(t => t.id === id);
-      if (index !== -1) {
-        mockTeachers.splice(index, 1);
-        return true;
-      }
-      return false;
-    });
+    const success = await handleAsync(() => 
+      firebaseService.deleteTeacher(id)
+    );
     if (success) {
       setTeachers(prev => prev.filter(t => t.id !== id));
     }
@@ -96,7 +65,7 @@ export const useTeachers = () => {
     }
     
     const data = await handleAsync(() => 
-      mockTeachers.filter(t => t.name.toLowerCase().includes(searchTerm.toLowerCase()))
+      firebaseService.searchTeachers(searchTerm)
     );
     if (data) {
       setTeachers(data);
@@ -104,7 +73,7 @@ export const useTeachers = () => {
   }, [handleAsync, fetchTeachers]);
 
   const fetchTeacherStats = useCallback(async () => {
-    const data = await handleAsync(() => mockStats);
+    const data = await handleAsync(firebaseService.getTeacherStats);
     if (data) {
       setStats(data);
     }
