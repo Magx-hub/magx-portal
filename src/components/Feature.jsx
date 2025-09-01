@@ -1,0 +1,27 @@
+import {
+    Typography,
+    Card,
+    CardBody,
+  } from "./Interface";
+  
+
+  export function Feature( icon, title, children ) {
+    return (
+      <Card color="transparent" shadow={false}>
+        <CardBody className="grid justify-start">
+          <div className="mb-4 grid h-12 w-12 place-content-center rounded-lg bg-gray-900 p-2.5 text-left text-white">
+            {icon}
+          </div>
+          <Typography variant="h5" color="blue-gray" className="mb-2">
+            {title}
+          </Typography>
+          <Typography className=" font-normal !text-gray-500">
+            {children}
+          </Typography>
+        </CardBody>
+      </Card>
+    );
+  }
+
+  export default Feature;
+  
