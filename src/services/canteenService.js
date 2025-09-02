@@ -15,7 +15,7 @@ import {
   endAt,
   Timestamp 
 } from 'firebase/firestore';
-import { db } from '../config/firebase';
+import { db } from '../firebase/config';
 
 // ===========================================
 // FEE STRUCTURE MANAGEMENT
