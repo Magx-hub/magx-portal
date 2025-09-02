@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Calculator, History, FileText, BarChart3, Users, TrendingUp, Plus, Download, Search, Menu, X, ChevronDown, Filter } from 'lucide-react';
 import { useAllowance } from '../hooks/useAllowance';
+import { getAllowanceRecords, getWelfareRecords, getAllowanceRecordByWeek } from '../services/allowanceService';
 import toast from 'react-hot-toast';
 
 const AllowanceModuleScreen = () => {
@@ -21,6 +22,14 @@ const AllowanceModuleScreen = () => {
   const [activeTab, setActiveTab] = useState('dashboard'); // 'dashboard', 'calculator', 'history', 'reports'
   const [search, setSearch] = useState('');
   const [showCalculator, setShowCalculator] = useState(false);
+
+  // Report states
+  const [selectedRecord, setSelectedRecord] = useState(null);
+  const [reportView, setReportView] = useState('overview'); // 'overview', 'detail', 'weekly'
+  const [weekNumber, setWeekNumber] = useState('');
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
+  const [reportType, setReportType] = useState('week'); // 'week', 'range'
 
   // Calculator form state
   const [calcForm, setCalcForm] = useState({
@@ -164,14 +173,14 @@ const AllowanceModuleScreen = () => {
 
   const generatePdfReport = async () => {
     setLoadingState(true);
-    
-    try {
-      // Get all calculations via database.js
-      const calculations = await getCalculations();
 
-      // Get welfare payments via database.js
-      const welfarePayments = await getWelfarePayments();
-      
+    try {
+      // Get all calculations
+      const { records: calculations } = await getAllowanceRecords();
+
+      // Get welfare payments
+      const { records: welfarePayments } = await getWelfareRecords();
+
       // Create HTML content for the PDF
       let htmlContent = `
         <html>
@@ -190,13 +199,13 @@ const AllowanceModuleScreen = () => {
           <body>
             <h1>Friday Allowance Report</h1>
             <p>Generated on ${new Date().toLocaleDateString()}</p>
-            
+
             <div class="section">
               <h2>Summary</h2>
               <p>Total Calculations: ${calculations.length}</p>
-              <p>Total Amount: GHS ${calculations.reduce((sum, calc) => sum + calc.totalSum, 0).toFixed(2)}</p>
+              <p>Total Amount: GHS ${calculations.reduce((sum, calc) => sum + (calc.totalSum || 0), 0).toFixed(2)}</p>
             </div>
-            
+
             <div class="section">
               <h2>Recent Calculations</h2>
               <table>
@@ -210,15 +219,15 @@ const AllowanceModuleScreen = () => {
                 ${calculations.slice(0, 5).map(calc => `
                   <tr>
                     <td>${calc.weekNumber}</td>
-                    <td>${new Date(calc.createdAt).toLocaleDateString()}</td>
-                    <td>GHS ${calc.totalSum.toFixed(2)}</td>
-                    <td>GHS ${calc.eachTeacher.toFixed(2)}</td>
-                    <td>GHS ${calc.eachJHSTeacher.toFixed(2)}</td>
+                    <td>${calc.createdAt ? new Date(calc.createdAt.toDate ? calc.createdAt.toDate() : calc.createdAt).toLocaleDateString() : 'N/A'}</td>
+                    <td>GHS ${(calc.totalSum || 0).toFixed(2)}</td>
+                    <td>GHS ${(calc.eachTeacher || 0).toFixed(2)}</td>
+                    <td>GHS ${(calc.eachJHSTeacher || 0).toFixed(2)}</td>
                   </tr>
                 `).join('')}
               </table>
             </div>
-            
+
             <div class="section">
               <h2>Welfare Payments</h2>
               <table>
@@ -230,28 +239,36 @@ const AllowanceModuleScreen = () => {
                 ${welfarePayments.slice(0, 5).map(payment => `
                   <tr>
                     <td>${payment.weekNumber}</td>
-                    <td>GHS ${payment.amount.toFixed(2)}</td>
-                    <td>${new Date(payment.createdAt).toLocaleDateString()}</td>
+                    <td>GHS ${(payment.welfare || 0).toFixed(2)}</td>
+                    <td>${payment.datePaid || 'N/A'}</td>
                   </tr>
                 `).join('')}
                 <tr class="total-row">
                   <td colspan="2">Total Welfare Payments</td>
-                  <td>GHS ${welfarePayments.reduce((sum, payment) => sum + payment.amount, 0).toFixed(2)}</td>
+                  <td>GHS ${welfarePayments.reduce((sum, payment) => sum + (payment.welfare || 0), 0).toFixed(2)}</td>
                 </tr>
               </table>
             </div>
           </body>
         </html>
       `;
-      
-      // Generate PDF
-      const { uri } = await Print.printToFileAsync({ html: htmlContent });
-      
-      // Share the PDF
-      await shareAsync(uri, { UTI: '.pdf', mimeType: 'application/pdf' });
+
+      // For web environment, we'll use a different approach since Print and shareAsync are for React Native
+      // Create a blob and download it
+      const blob = new Blob([htmlContent], { type: 'text/html' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `allowance-report-${new Date().toISOString().split('T')[0]}.html`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+
+      toast.success('Report downloaded successfully!');
     } catch (error) {
-      console.error('Error generating PDF:', error);
-      Alert.alert('Error', 'Failed to generate PDF report');
+      console.error('Error generating report:', error);
+      toast.error('Failed to generate report');
     } finally {
       setLoadingState(false);
     }
@@ -260,9 +277,310 @@ const AllowanceModuleScreen = () => {
 
 
 
-  // Export to PDF (placeholder) // showSucces
-  const handleExport = () => {
-    toast.success('PDF export feature coming soon');
+  // Generate weekly report PDF
+  const generateWeeklyPdf = async () => {
+    if (!weekNumber) {
+      toast.error('Please enter a week number');
+      return;
+    }
+
+    setLoadingState(true);
+
+    try {
+      const record = await getAllowanceRecordByWeek(parseInt(weekNumber, 10));
+
+      if (!record) {
+        toast.error('No data found for the specified week');
+        return;
+      }
+
+      const htmlContent = `
+        <html>
+          <head>
+            <style>
+              body { font-family: Arial, sans-serif; margin: 20px; }
+              h1 { color: #2c3e50; text-align: center; }
+              h2 { color: #34495e; border-bottom: 1px solid #eee; padding-bottom: 8px; }
+              table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+              th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+              th { background-color: #f2f2f2; }
+              .total-row { font-weight: bold; }
+            </style>
+          </head>
+          <body>
+            <h1>Weekly Allowance Report</h1>
+            <h2>Week ${record.weekNumber}</h2>
+
+            <table>
+              <tr>
+                <th>Description</th>
+                <th>Amount (GHS)</th>
+              </tr>
+              <tr>
+                <td>Total Sum</td>
+                <td>${(record.totalSum || 0).toFixed(2)}</td>
+              </tr>
+              <tr>
+                <td>Welfare</td>
+                <td>${(record.welfare || 0).toFixed(2)}</td>
+              </tr>
+              <tr>
+                <td>Office (5%)</td>
+                <td>${(record.office || 0).toFixed(2)}</td>
+              </tr>
+              <tr>
+                <td>Kitchen (5%)</td>
+                <td>${(record.kitchen || 0).toFixed(2)}</td>
+              </tr>
+              <tr class="total-row">
+                <td>Balance After Deductions</td>
+                <td>${(record.balanceAfterKitchen || 0).toFixed(2)}</td>
+              </tr>
+              <tr>
+                <td>Each Teacher (${record.numberOfTeachers || 0})</td>
+                <td>${(record.eachTeacher || 0).toFixed(2)}</td>
+              </tr>
+              <tr>
+                <td>Each JHS Teacher (${record.numberOfJHSTeachers || 0})</td>
+                <td>${(record.eachJHSTeacher || 0).toFixed(2)}</td>
+              </tr>
+            </table>
+          </body>
+        </html>
+      `;
+
+      const blob = new Blob([htmlContent], { type: 'text/html' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `weekly-report-week-${weekNumber}-${new Date().toISOString().split('T')[0]}.html`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+
+      toast.success('Weekly report downloaded successfully!');
+    } catch (error) {
+      console.error('Error generating weekly report:', error);
+      toast.error('Failed to generate weekly report');
+    } finally {
+      setLoadingState(false);
+    }
+  };
+
+  // Generate date range report PDF
+  const generateDateRangePdf = async () => {
+    if (!startDate || !endDate) {
+      toast.error('Please select both start and end dates');
+      return;
+    }
+
+    setLoadingState(true);
+
+    try {
+      const allRecords = await getAllowanceRecords();
+      const records = allRecords.records.filter(record => {
+        if (!record.createdAt) return false;
+        const recordDate = record.createdAt.toDate ? record.createdAt.toDate() : new Date(record.createdAt);
+        const start = new Date(startDate);
+        const end = new Date(endDate);
+        return recordDate >= start && recordDate <= end;
+      });
+
+      if (!records || records.length === 0) {
+        toast.error('No data found for the specified date range');
+        return;
+      }
+
+      const totalSum = records.reduce((sum, record) => sum + (record.totalSum || 0), 0);
+      const totalWelfare = records.reduce((sum, record) => sum + (record.welfare || 0), 0);
+      const totalOffice = records.reduce((sum, record) => sum + (record.office || 0), 0);
+      const totalKitchen = records.reduce((sum, record) => sum + (record.kitchen || 0), 0);
+      const totalBalance = records.reduce((sum, record) => sum + (record.balanceAfterKitchen || 0), 0);
+
+      const htmlContent = `
+        <html>
+          <head>
+            <style>
+              body { font-family: Arial, sans-serif; margin: 20px; }
+              h1 { color: #2c3e50; text-align: center; }
+              h2 { color: #34495e; border-bottom: 1px solid #eee; padding-bottom: 8px; }
+              table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+              th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+              th { background-color: #f2f2f2; }
+              .total-row { font-weight: bold; }
+            </style>
+          </head>
+          <body>
+            <h1>Date Range Allowance Report</h1>
+            <h2>${new Date(startDate).toLocaleDateString()} to ${new Date(endDate).toLocaleDateString()}</h2>
+
+            <table>
+              <tr>
+                <th>Week</th>
+                <th>Date</th>
+                <th>Total Sum</th>
+                <th>Each Teacher</th>
+                <th>Each JHS Teacher</th>
+              </tr>
+              ${records.map(record => `
+                <tr>
+                  <td>${record.weekNumber}</td>
+                  <td>${record.createdAt ? (record.createdAt.toDate ? record.createdAt.toDate() : new Date(record.createdAt)).toLocaleDateString() : 'N/A'}</td>
+                  <td>${(record.totalSum || 0).toFixed(2)}</td>
+                  <td>${(record.eachTeacher || 0).toFixed(2)}</td>
+                  <td>${(record.eachJHSTeacher || 0).toFixed(2)}</td>
+                </tr>
+              `).join('')}
+              <tr class="total-row">
+                <td colspan="2">Totals</td>
+                <td>${totalSum.toFixed(2)}</td>
+                <td colspan="2"></td>
+              </tr>
+            </table>
+          </body>
+        </html>
+      `;
+
+      const blob = new Blob([htmlContent], { type: 'text/html' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `date-range-report-${new Date().toISOString().split('T')[0]}.html`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+
+      toast.success('Date range report downloaded successfully!');
+    } catch (error) {
+      console.error('Error generating date range report:', error);
+      toast.error('Failed to generate date range report');
+    } finally {
+      setLoadingState(false);
+    }
+  };
+
+  // Generate detailed report PDF for individual record
+  const generateDetailPdf = async (record) => {
+    if (!record) return;
+
+    setLoadingState(true);
+
+    try {
+      const htmlContent = `
+        <html>
+          <head>
+            <style>
+              body { font-family: Arial, sans-serif; margin: 20px; }
+              h1 { color: #2c3e50; text-align: center; }
+              h2 { color: #34495e; border-bottom: 1px solid #eee; padding-bottom: 8px; }
+              table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+              th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+              th { background-color: #f2f2f2; }
+              .total-row { font-weight: bold; }
+              .section { margin-bottom: 30px; }
+            </style>
+          </head>
+          <body>
+            <h1>Friday Allowance Report</h1>
+            <h2>Week ${record.weekNumber} - ${record.createdAt ? (record.createdAt.toDate ? record.createdAt.toDate() : new Date(record.createdAt)).toLocaleDateString() : 'N/A'}</h2>
+
+            <div class="section">
+              <h3>Class Contributions</h3>
+              <table>
+                <tr>
+                  <th>Class</th>
+                  <th>Amount (GHS)</th>
+                </tr>
+                <tr><td>Creche</td><td>${(record.creche || 0).toFixed(2)}</td></tr>
+                <tr><td>Nursery 1</td><td>${(record.nursery1 || 0).toFixed(2)}</td></tr>
+                <tr><td>Nursery 2</td><td>${(record.nursery2 || 0).toFixed(2)}</td></tr>
+                <tr><td>KG 1</td><td>${(record.kg1 || 0).toFixed(2)}</td></tr>
+                <tr><td>KG 2</td><td>${(record.kg2 || 0).toFixed(2)}</td></tr>
+                <tr><td>Basic 1</td><td>${(record.basic1 || 0).toFixed(2)}</td></tr>
+                <tr><td>Basic 2</td><td>${(record.basic2 || 0).toFixed(2)}</td></tr>
+                <tr><td>Basic 3</td><td>${(record.basic3 || 0).toFixed(2)}</td></tr>
+                <tr><td>Basic 4</td><td>${(record.basic4 || 0).toFixed(2)}</td></tr>
+                <tr><td>Basic 5</td><td>${(record.basic5 || 0).toFixed(2)}</td></tr>
+                <tr><td>Basic 6</td><td>${(record.basic6 || 0).toFixed(2)}</td></tr>
+                <tr><td>Basic 7 (General)</td><td>${(record.basic7General || 0).toFixed(2)}</td></tr>
+                <tr><td>Basic 7 (JHS)</td><td>${(record.basic7JHS || 0).toFixed(2)}</td></tr>
+                <tr><td>Basic 8 (General)</td><td>${(record.basic8General || 0).toFixed(2)}</td></tr>
+                <tr><td>Basic 8 (JHS)</td><td>${(record.basic8JHS || 0).toFixed(2)}</td></tr>
+                <tr><td>Basic 9 (General)</td><td>${(record.basic9General || 0).toFixed(2)}</td></tr>
+                <tr><td>Basic 9 (JHS)</td><td>${(record.basic9JHS || 0).toFixed(2)}</td></tr>
+                <tr class="total-row">
+                  <td>Total Sum</td>
+                  <td>${(record.totalSum || 0).toFixed(2)}</td>
+                </tr>
+              </table>
+            </div>
+
+            <div class="section">
+              <h3>Deductions</h3>
+              <table>
+                <tr>
+                  <th>Item</th>
+                  <th>Amount (GHS)</th>
+                  <th>Balance After</th>
+                </tr>
+                <tr>
+                  <td>Welfare</td>
+                  <td>${(record.welfare || 0).toFixed(2)}</td>
+                  <td>${(record.balanceAfterWelfare || 0).toFixed(2)}</td>
+                </tr>
+                <tr>
+                  <td>Office (5%)</td>
+                  <td>${(record.office || 0).toFixed(2)}</td>
+                  <td>${(record.balanceAfterOffice || 0).toFixed(2)}</td>
+                </tr>
+                <tr>
+                  <td>Kitchen (5%)</td>
+                  <td>${(record.kitchen || 0).toFixed(2)}</td>
+                  <td>${(record.balanceAfterKitchen || 0).toFixed(2)}</td>
+                </tr>
+              </table>
+            </div>
+
+            <div class="section">
+              <h3>Teacher Payments</h3>
+              <table>
+                <tr>
+                  <th>Description</th>
+                  <th>Amount (GHS)</th>
+                </tr>
+                <tr>
+                  <td>Regular Teachers (${record.numberOfTeachers || 0})</td>
+                  <td>${(record.eachTeacher || 0).toFixed(2)} each</td>
+                </tr>
+                <tr>
+                  <td>JHS Teachers (${record.numberOfJHSTeachers || 0})</td>
+                  <td>${(record.eachJHSTeacher || 0).toFixed(2)} each</td>
+                </tr>
+              </table>
+            </div>
+          </body>
+        </html>
+      `;
+
+      const blob = new Blob([htmlContent], { type: 'text/html' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `detail-report-week-${record.weekNumber}-${new Date().toISOString().split('T')[0]}.html`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+
+      toast.success('Detailed report downloaded successfully!');
+    } catch (error) {
+      console.error('Error generating detailed report:', error);
+      toast.error('Failed to generate detailed report');
+    } finally {
+      setLoadingState(false);
+    }
   };
 
   return (
@@ -600,26 +918,165 @@ const AllowanceModuleScreen = () => {
         {/* Reports Tab */}
         {activeTab === 'reports' && (
           <div className="space-y-4">
+            {/* Report Type Selection */}
             <div className="bg-white rounded-xl shadow-sm p-4">
               <h2 className="text-lg font-semibold text-gray-900 mb-4">Reports</h2>
 
-              <div className="space-y-4">
-                <div className="bg-gradient-to-br from-blue-50 to-indigo-100 h-32 rounded-xl flex items-center justify-center border border-blue-200">
-                  <div className="text-center">
-                    <FileText size={32} className="mx-auto mb-2 text-blue-500" />
-                    <p className="text-blue-700 font-medium">Generate Full Report</p>
-                    <p className="text-blue-600 text-sm">PDF export coming soon</p>
+              <div className="grid grid-cols-1 gap-4">
+                {/* Full Report */}
+                <div className="bg-gradient-to-br from-blue-50 to-indigo-100 p-4 rounded-xl border border-blue-200">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <FileText size={24} className="text-blue-500" />
+                      <div>
+                        <p className="text-blue-700 font-medium">Full Report</p>
+                        <p className="text-blue-600 text-sm">All calculations and welfare payments</p>
+                      </div>
+                    </div>
+                    <button
+                      onClick={generatePdfReport}
+                      disabled={loadingState}
+                      className="bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white px-4 py-2 rounded-lg flex items-center gap-2 font-medium transition-colors"
+                    >
+                      {loadingState ? (
+                        <>
+                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                          <span>Generating...</span>
+                        </>
+                      ) : (
+                        <>
+                          <Download size={16} />
+                          <span>Generate</span>
+                        </>
+                      )}
+                    </button>
                   </div>
                 </div>
 
-                <button
-                  onClick={handleExport}
-                  className="w-full bg-blue-600 hover:bg-blue-700 text-white p-3 rounded-lg flex items-center justify-center gap-2 font-medium transition-colors"
-                >
-                  <Download size={20} />
-                  <span>Generate PDF Report</span>
-                </button>
+                {/* Weekly Report */}
+                <div className="bg-white border border-gray-200 p-4 rounded-xl">
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center gap-3">
+                      <BarChart3 size={24} className="text-green-500" />
+                      <div>
+                        <p className="text-gray-900 font-medium">Weekly Report</p>
+                        <p className="text-gray-600 text-sm">Generate report for specific week</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex gap-2">
+                    <input
+                      type="number"
+                      placeholder="Week number (1-52)"
+                      value={weekNumber}
+                      onChange={(e) => setWeekNumber(e.target.value)}
+                      className="flex-1 p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 text-sm"
+                    />
+                    <button
+                      onClick={generateWeeklyPdf}
+                      disabled={loadingState || !weekNumber}
+                      className="bg-green-600 hover:bg-green-700 disabled:bg-green-400 text-white px-4 py-2 rounded-lg flex items-center gap-2 font-medium transition-colors"
+                    >
+                      <Download size={16} />
+                      <span>Generate</span>
+                    </button>
+                  </div>
+                </div>
+
+                {/* Date Range Report */}
+                <div className="bg-white border border-gray-200 p-4 rounded-xl">
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center gap-3">
+                      <TrendingUp size={24} className="text-purple-500" />
+                      <div>
+                        <p className="text-gray-900 font-medium">Date Range Report</p>
+                        <p className="text-gray-600 text-sm">Generate report for date range</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-2 mb-3">
+                    <div>
+                      <label className="block text-xs text-gray-600 mb-1">Start Date</label>
+                      <input
+                        type="date"
+                        value={startDate}
+                        onChange={(e) => setStartDate(e.target.value)}
+                        className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-sm"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs text-gray-600 mb-1">End Date</label>
+                      <input
+                        type="date"
+                        value={endDate}
+                        onChange={(e) => setEndDate(e.target.value)}
+                        className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-sm"
+                      />
+                    </div>
+                  </div>
+
+                  <button
+                    onClick={generateDateRangePdf}
+                    disabled={loadingState || !startDate || !endDate}
+                    className="w-full bg-purple-600 hover:bg-purple-700 disabled:bg-purple-400 text-white px-4 py-2 rounded-lg flex items-center justify-center gap-2 font-medium transition-colors"
+                  >
+                    <Download size={16} />
+                    <span>Generate Date Range Report</span>
+                  </button>
+                </div>
               </div>
+            </div>
+
+            {/* Recent Calculations with Detail View */}
+            <div className="bg-white rounded-xl shadow-sm p-4">
+              <h2 className="text-lg font-semibold text-gray-900 mb-4">Recent Calculations</h2>
+
+              {loading ? (
+                <div className="text-gray-500 text-center py-8">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+                  <p className="mt-2">Loading...</p>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {allowances.slice(0, 10).map(record => (
+                    <div key={record.id} className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                      <div className="flex items-start justify-between mb-2">
+                        <div className="flex-1">
+                          <h3 className="font-semibold text-gray-900">Week {record.weekNumber}</h3>
+                          <p className="text-sm text-gray-600">{new Date(record.createdAt?.toDate?.() || record.createdAt).toLocaleDateString()}</p>
+                        </div>
+                        <button
+                          onClick={() => generateDetailPdf(record)}
+                          disabled={loadingState}
+                          className="bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white px-3 py-1 rounded-lg flex items-center gap-1 font-medium transition-colors text-sm"
+                        >
+                          <Download size={14} />
+                          <span>Detail PDF</span>
+                        </button>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-4 text-sm">
+                        <div>
+                          <p className="text-gray-500">Total</p>
+                          <p className="font-medium text-gray-900">GHS {record.totalSum?.toFixed(2)}</p>
+                        </div>
+                        <div>
+                          <p className="text-gray-500">Each Teacher</p>
+                          <p className="font-medium text-gray-900">GHS {record.eachTeacher?.toFixed(2)}</p>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                  {allowances.length === 0 && (
+                    <div className="text-gray-500 text-center py-8 bg-gray-50 rounded-lg">
+                      <FileText size={32} className="mx-auto mb-2 text-gray-400" />
+                      <p>No calculations found</p>
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           </div>
         )}
