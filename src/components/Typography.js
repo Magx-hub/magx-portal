@@ -10,7 +10,7 @@ export const Typography = ({ variant = 'p', color = 'black', className = '', chi
   };
   
   const colorClasses = {
-    'blue-gray': 'text-blue-gray-900',
+    'blue-gray': 'text-black',
     'black': 'text-black',
     'gray': 'text-gray-600'
   };

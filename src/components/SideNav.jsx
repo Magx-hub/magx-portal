@@ -13,7 +13,7 @@ const SideNav = () => {
   ];
 
   return (
-    <div className="hidden md:flex flex-col w-64 bg-gray-800 text-white">
+    <div className="hidden md:flex flex-col w-64 bg-blue-600 text-white rounded-r-lg">
       <div className="p-4 font-bold text-xl">MagX Portal</div>
       <nav className="flex-1 px-2 py-4 space-y-2">
         {navItems.map((item) => (
@@ -21,7 +21,7 @@ const SideNav = () => {
             key={item.path}
             to={item.path}
             className={({ isActive }) =>
-              `flex items-center px-4 py-2 rounded-md ${isActive ? 'bg-gray-700' : ''}`
+              `flex items-center px-4 py-2 rounded-md ${isActive ? 'bg-blue-700' : ''}`
             }
           >
             {item.icon}

@@ -41,7 +41,7 @@ const StudentForm = ({ student, onClose, onSave }) => {
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
       <div className="bg-white rounded-lg shadow-xl w-full max-w-md">
         <div className="flex justify-between items-center p-6 border-b">
-          <h2 className="text-xl font-semibold text-gray-800">
+          <h2 className="text-xl font-semibold text-black">
             {student ? 'Edit Student' : 'Add New Student'}
           </h2>
           <button
@@ -60,7 +60,7 @@ const StudentForm = ({ student, onClose, onSave }) => {
         
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
           <div>
-            <label htmlFor="fullname" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="fullname" className="block text-sm font-medium text-black mb-1">
               Full Name
             </label>
             <input
@@ -72,9 +72,9 @@ const StudentForm = ({ student, onClose, onSave }) => {
               required
             />
           </div>
-          
+
           <div>
-            <label htmlFor="department" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="department" className="block text-sm font-medium text-black mb-1">
               Department
             </label>
             <input
@@ -86,9 +86,9 @@ const StudentForm = ({ student, onClose, onSave }) => {
               required
             />
           </div>
-          
+
           <div>
-            <label htmlFor="gender" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="gender" className="block text-sm font-medium text-black mb-1">
               Gender
             </label>
             <select
@@ -106,16 +106,16 @@ const StudentForm = ({ student, onClose, onSave }) => {
           </div>
           
           <div className="flex justify-end space-x-3 pt-4">
-            <button 
-              type="button" 
-              className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 hover:bg-gray-300 rounded-md disabled:opacity-50"
+            <button
+              type="button"
+              className="px-4 py-2 text-sm font-medium text-black bg-gray-200 hover:bg-gray-300 rounded-md disabled:opacity-50"
               onClick={onClose}
               disabled={loading}
             >
               Cancel
             </button>
-            <button 
-              type="submit" 
+            <button
+              type="submit"
               className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-md disabled:opacity-50"
               disabled={loading}
             >

@@ -29,21 +29,21 @@ const StudentList = ({ students, loading, error, onEdit, onDelete }) => {
         <li key={student.id} className="py-4 px-4 hover:bg-gray-50 transition-colors">
           <div className="flex justify-between items-center">
             <div className="flex-1 min-w-0">
-              <h3 className="text-lg font-medium text-gray-900 truncate">
+              <h3 className="text-lg font-medium text-black truncate">
                 {student.fullname}
               </h3>
-              <p className="text-sm text-gray-500">
+              <p className="text-sm text-gray-600">
                 {student.department} • {student.gender}
               </p>
             </div>
             <div className="flex space-x-2 ml-4">
-              <button 
+              <button
                 className="px-3 py-1 text-sm font-medium text-blue-600 hover:text-blue-800 hover:bg-blue-100 rounded transition-colors"
                 onClick={() => onEdit(student)}
               >
                 Edit
               </button>
-              <button 
+              <button
                 className="px-3 py-1 text-sm font-medium text-red-600 hover:text-red-800 hover:bg-red-100 rounded transition-colors"
                 onClick={() => onDelete(student.id)}
               >

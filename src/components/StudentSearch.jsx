@@ -15,29 +15,30 @@ const StudentSearch = ({ onSearch, searching, results, onClear, onEdit, onDelete
   };
 
   return (
-    <div>
-      <div className="search-container">
-        <form onSubmit={handleSearch} className="search-input">
-          <input
-            type="text"
-            placeholder="Search students by name or department..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-          <button type="submit" className="btn btn-primary" disabled={searching}>
+    <div className="bg-white rounded-lg shadow-lg p-6">
+      <form onSubmit={handleSearch} className="flex flex-col sm:flex-row gap-4 mb-6">
+        <input
+          type="text"
+          placeholder="Search students by name or department..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="flex-1 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-black"
+        />
+        <div className="flex gap-2">
+          <button type="submit" className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50" disabled={searching}>
             {searching ? 'Searching...' : 'Search'}
           </button>
-          <button type="button" className="btn btn-secondary" onClick={handleClear}>
+          <button type="button" className="px-4 py-2 bg-gray-200 text-black rounded-md hover:bg-gray-300" onClick={handleClear}>
             Clear
           </button>
-        </form>
-      </div>
+        </div>
+      </form>
 
       {searching ? (
-        <div className="loading">Searching...</div>
+        <div className="text-center py-8 text-black">Searching...</div>
       ) : (
-        <StudentList 
-          students={results} 
+        <StudentList
+          students={results}
           loading={false}
           error={null}
           onEdit={onEdit}

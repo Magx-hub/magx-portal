@@ -10,7 +10,7 @@ const Typography = ({ variant = 'p', color = 'black', className = '', children, 
   };
   
   const colorClasses = {
-    'blue-gray': 'text-blue-gray-900',
+    'blue-gray': 'text-black',
     'black': 'text-black',
     'gray': 'text-gray-600'
   };
@@ -64,15 +64,15 @@ const Card = ({
 // Feature Card component that matches your specification
 const FeatureCard = ({ icon, title, children, ...cardProps }) => {
   return (
-    <Card color="transparent" shadow={false} {...cardProps}>
+    <Card color="white" shadow={true} {...cardProps}>
       <CardBody className="grid justify-start">
-        <div className="mb-4 grid h-12 w-12 place-content-center rounded-lg bg-gray-900 p-2.5 text-left text-white">
+        <div className="mb-4 grid h-12 w-12 place-content-center rounded-lg bg-blue-600 p-2.5 text-left text-white">
           {icon}
         </div>
-        <Typography variant="h5" color="blue-gray" className="mb-2">
+        <Typography variant="h5" color="black" className="mb-2">
           {title}
         </Typography>
-        <Typography className="font-normal !text-gray-500">
+        <Typography className="font-normal !text-black">
           {children}
         </Typography>
       </CardBody>
