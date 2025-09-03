@@ -1,13 +1,13 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { Users, Calendar, Money, ForkKnife, House } from 'phosphor-react';
+import { Users, Calendar, WalletCards, ForkKnife, House } from 'lucide-react';
 
 const Dashboard = () => {
   const modules = [
     { path: '/teachers', icon: <Users size={32} />, name: 'Teachers', description: 'Manage teacher records' },
     { path: '/students', icon: <Users size={32} />, name: 'Students', description: 'Manage student records' },
     { path: '/attendance', icon: <Calendar size={32} />, name: 'Attendance', description: 'Track attendance' },
-    { path: '/allowance', icon: <Money size={32} />, name: 'Allowance', description: 'Manage allowances' },
+    { path: '/allowance', icon: <WalletCards size={32} />, name: 'Allowance', description: 'Manage allowances' },
     { path: '/canteen', icon: <ForkKnife size={32} />, name: 'Canteen management' },
   ];
 

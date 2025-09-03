@@ -1,6 +1,6 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { House, Users, Calendar, Money, ForkKnife } from 'phosphor-react';
+import { House, Users, Calendar, ForkKnife } from 'lucide-react';
 
 const BottomNav = () => {
   const navItems = [

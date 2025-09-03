@@ -1,6 +1,6 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { House, Users, Calendar, Money, ForkKnife } from 'phosphor-react';
+import { House, Users, Calendar, WalletCards, ForkKnife } from 'lucide-react';
 
 const SideNav = () => {
   const navItems = [
@@ -8,7 +8,7 @@ const SideNav = () => {
     { path: '/teachers', icon: <Users size={24} />, name: 'Teachers' },
     { path: '/students', icon: <Users size={24} />, name: 'Students' },
     { path: '/attendance', icon: <Calendar size={24} />, name: 'Attendance' },
-    { path: '/allowance', icon: <Money size={24} />, name: 'Allowance' },
+    { path: '/allowance', icon: <WalletCards size={24} />, name: 'Allowance' },
     { path: '/canteen', icon: <ForkKnife size={24} />, name: 'Canteen' },
   ];
 
