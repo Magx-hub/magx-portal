@@ -27,7 +27,7 @@ const Navigation = () => {
   const isMobile = width < 768;
 
   return (
-    <Router basename="/magx-portal">
+    <Router>
       <div className="flex h-screen">
         {!isMobile && <SideNav />}
         <main className="flex-1 overflow-y-auto">
