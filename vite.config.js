@@ -10,7 +10,7 @@ export default defineConfig({
   plugins: [
     react(),
     tailwindcss(),
-    // visualizer({ open: true }),
+    visualizer({ open: true }),
     VitePWA({
       strategies: 'generateSW', // Changed from 'injectManifest' to 'generateSW' for easier setup
       registerType: 'autoUpdate',
