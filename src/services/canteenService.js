@@ -10,9 +10,7 @@ import {
   query, 
   where, 
   orderBy, 
-  limit, 
-  startAt, 
-  endAt,
+  limit,
   Timestamp 
 } from 'firebase/firestore';
 import { db } from '../firebase/config';
@@ -25,9 +23,13 @@ import { db } from '../firebase/config';
 export const getCurrentFeeStructure = async (department) => {
   try {
     const feeStructuresRef = collection(db, 'feeStructures');
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
     const q = query(
       feeStructuresRef,
       where('department', '==', department),
+      where('effectiveDate', '<=', Timestamp.fromDate(today)),
       orderBy('effectiveDate', 'desc'),
       limit(1)
     );
@@ -74,11 +76,12 @@ export const addFeeStructure = async (feeData) => {
   try {
     const feeStructuresRef = collection(db, 'feeStructures');
     
-    const { department, classesFee, breakfastFee, effectiveDate } = feeData;
+    const { department, classesFee, canteenFee, breakfastFee, effectiveDate } = feeData;
     
     const docData = {
       department,
       classesFee: Number(classesFee),
+      canteenFee: Number(canteenFee),
       breakfastFee: Number(breakfastFee),
       effectiveDate: effectiveDate instanceof Date ? Timestamp.fromDate(effectiveDate) : Timestamp.fromDate(new Date(effectiveDate)),
       createdAt: Timestamp.now(),
@@ -98,11 +101,12 @@ export const updateFeeStructure = async (id, feeData) => {
   try {
     const feeStructureRef = doc(db, 'feeStructures', id);
     
-    const { department, classesFee, breakfastFee, effectiveDate } = feeData;
+    const { department, classesFee, canteenFee, breakfastFee, effectiveDate } = feeData;
     
     const updateData = {
       department,
       classesFee: Number(classesFee),
+      canteenFee: Number(canteenFee),
       breakfastFee: Number(breakfastFee),
       effectiveDate: effectiveDate instanceof Date ? Timestamp.fromDate(effectiveDate) : Timestamp.fromDate(new Date(effectiveDate)),
       updatedAt: Timestamp.now()
@@ -140,7 +144,8 @@ export const recordDailyPayment = async (paymentData) => {
     const { 
       studentId, 
       classesFee, 
-      breakfastFee, 
+      canteenFee, 
+      breakfastFee = 0, 
       otherFee = 0, 
       paymentMethod, 
       notes,
@@ -160,12 +165,13 @@ export const recordDailyPayment = async (paymentData) => {
       throw new Error(`Payment already exists for student on ${paymentDate}`);
     }
     
-    const totalFee = Number(classesFee) + Number(breakfastFee) + Number(otherFee);
+    const totalFee = Number(classesFee) + Number(canteenFee) + Number(breakfastFee) + Number(otherFee);
     
     const docData = {
       studentId,
       paymentDate,
       classesFee: Number(classesFee),
+      canteenFee: Number(canteenFee),
       breakfastFee: Number(breakfastFee),
       otherFee: Number(otherFee),
       totalFee,
@@ -236,6 +242,44 @@ export const getDailyPayments = async (date = null) => {
   }
 };
 
+// Get students who haven't paid today
+export const getStudentsNotPaidToday = async (date = null) => {
+  try {
+    const targetDate = date || new Date().toISOString().split('T')[0];
+    
+    // Get all students
+    const studentsRef = collection(db, 'students');
+    const studentsSnapshot = await getDocs(studentsRef);
+    const allStudents = studentsSnapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data()
+    }));
+    
+    // Get students who have paid today
+    const dailyPaymentsRef = collection(db, 'dailyPayments');
+    const paymentsQuery = query(
+      dailyPaymentsRef,
+      where('paymentDate', '==', targetDate)
+    );
+    const paymentsSnapshot = await getDocs(paymentsQuery);
+    const paidStudentIds = new Set(
+      paymentsSnapshot.docs.map(doc => doc.data().studentId)
+    );
+    
+    // Filter out students who have already paid
+    const unpaidStudents = allStudents.filter(student => 
+      !paidStudentIds.has(student.id)
+    );
+    
+    return unpaidStudents.sort((a, b) => 
+      a.fullname.localeCompare(b.fullname)
+    );
+  } catch (error) {
+    console.error('Error getting students not paid today:', error);
+    throw error;
+  }
+};
+
 // Get payments for a specific student
 export const getStudentPayments = async (studentId, startDate = null, endDate = null) => {
   try {
@@ -284,12 +328,13 @@ export const updateDailyPayment = async (id, paymentData) => {
   try {
     const paymentRef = doc(db, 'dailyPayments', id);
     
-    const { classesFee, breakfastFee, otherFee, paymentMethod, notes } = paymentData;
+    const { classesFee, canteenFee, breakfastFee, otherFee, paymentMethod, notes } = paymentData;
     
-    const totalFee = Number(classesFee) + Number(breakfastFee) + Number(otherFee);
+    const totalFee = Number(classesFee) + Number(canteenFee) + Number(breakfastFee) + Number(otherFee);
     
     const updateData = {
       classesFee: Number(classesFee),
+      canteenFee: Number(canteenFee),
       breakfastFee: Number(breakfastFee),
       otherFee: Number(otherFee),
       totalFee,
@@ -334,6 +379,7 @@ export const getDailySummary = async (date = null) => {
     
     let totalPayments = 0;
     let totalClassesFee = 0;
+    let totalCanteenFee = 0;
     let totalBreakfastFee = 0;
     let totalOtherFee = 0;
     let totalAmount = 0;
@@ -343,19 +389,29 @@ export const getDailySummary = async (date = null) => {
       const data = doc.data();
       totalPayments++;
       totalClassesFee += Number(data.classesFee || 0);
+      totalCanteenFee += Number(data.canteenFee || 0);
       totalBreakfastFee += Number(data.breakfastFee || 0);
       totalOtherFee += Number(data.otherFee || 0);
       totalAmount += Number(data.totalFee || 0);
       uniqueStudents.add(data.studentId);
     });
     
+    // Get total number of students to calculate unpaid
+    const studentsRef = collection(db, 'students');
+    const studentsSnapshot = await getDocs(studentsRef);
+    const totalStudents = studentsSnapshot.size;
+    const studentsNotPaid = totalStudents - uniqueStudents.size;
+    
     return {
       totalPayments,
       totalClassesFee,
+      totalCanteenFee,
       totalBreakfastFee,
       totalOtherFee,
       totalAmount,
-      uniqueStudents: uniqueStudents.size
+      uniqueStudents: uniqueStudents.size,
+      studentsNotPaid,
+      totalStudents
     };
   } catch (error) {
     console.error('Error getting daily summary:', error);
@@ -395,6 +451,7 @@ export const getDepartmentSummary = async (date = null) => {
           department,
           totalPayments: 0,
           totalClassesFee: 0,
+          totalCanteenFee: 0,
           totalBreakfastFee: 0,
           totalOtherFee: 0,
           totalAmount: 0
@@ -403,6 +460,7 @@ export const getDepartmentSummary = async (date = null) => {
       
       departmentSummary[department].totalPayments++;
       departmentSummary[department].totalClassesFee += Number(paymentData.classesFee || 0);
+      departmentSummary[department].totalCanteenFee += Number(paymentData.canteenFee || 0);
       departmentSummary[department].totalBreakfastFee += Number(paymentData.breakfastFee || 0);
       departmentSummary[department].totalOtherFee += Number(paymentData.otherFee || 0);
       departmentSummary[department].totalAmount += Number(paymentData.totalFee || 0);
@@ -574,7 +632,7 @@ export const getAggregatedPayments = async (groupBy, startDate, endDate) => {
 // ===========================================
 
 // Calculate total fee for a student based on current fee structure
-export const calculateStudentFee = async (studentId, otherFee = 0) => {
+export const calculateStudentFee = async (studentId, otherFee = 0, customBreakfastFee = null) => {
   try {
     // Get student's department
     const studentRef = doc(db, 'students', studentId);
@@ -593,13 +651,15 @@ export const calculateStudentFee = async (studentId, otherFee = 0) => {
       throw new Error(`No fee structure found for department: ${student.department}`);
     }
     
-    const totalFee = Number(feeStructure.classesFee) + Number(feeStructure.breakfastFee) + Number(otherFee);
+    const finalBreakfastFee = customBreakfastFee !== null ? customBreakfastFee : feeStructure.breakfastFee;
+    const totalFee = Number(feeStructure.classesFee) + Number(feeStructure.canteenFee) + Number(finalBreakfastFee) + Number(otherFee);
     
     return {
       studentId,
       department: student.department,
       classesFee: feeStructure.classesFee,
-      breakfastFee: feeStructure.breakfastFee,
+      canteenFee: feeStructure.canteenFee,
+      breakfastFee: finalBreakfastFee,
       otherFee: Number(otherFee),
       totalFee
     };

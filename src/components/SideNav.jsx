@@ -1,5 +1,5 @@
 import { NavLink } from 'react-router-dom';
-import { House, Users, Calendar, WalletCards, ForkKnife } from 'lucide-react';
+import { House, Users, Calendar, WalletCards, ForkKnife, PenSquare } from 'lucide-react';
 
 const SideNav = () => {
   const navItems = [
@@ -9,6 +9,7 @@ const SideNav = () => {
     { path: '/attendance', icon: <Calendar size={24} />, name: 'Attendance' },
     { path: '/allowance', icon: <WalletCards size={24} />, name: 'Allowance' },
     { path: '/canteen', icon: <ForkKnife size={24} />, name: 'Canteen' },
+    { path: '/performance', icon: <PenSquare size={24} />, name: 'PerformanceMonitor' },
   ];
 
   return (
