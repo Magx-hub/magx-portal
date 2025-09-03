@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { FileText, BarChart3, TrendingUp, Download } from 'lucide-react';
 import { generatePdfReport, generateWeeklyPdf, generateDateRangePdf, generateDetailPdf } from './AllowancePDF';
 

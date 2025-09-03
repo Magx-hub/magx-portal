@@ -1,5 +1,4 @@
 
-import React from 'react';
 import { Calculator, Download, Plus, X } from 'lucide-react';
 
 const AllowanceDashboard = ({ summary, allowances, loading, showCalculator, setShowCalculator, generatePdfReport }) => {

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Search, X, RefreshCw, Users, Building, TrendingUp, Filter, BarChart3, UserCheck, Eye, Edit, Trash2 } from 'lucide-react';
 
 // Enhanced StudentSearch Component

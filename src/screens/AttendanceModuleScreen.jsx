@@ -1,5 +1,5 @@
 
-import React, { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { BarChart3, Users } from 'lucide-react';
 import { useTeachers } from '../hooks/useTeachers';
 import { useAttendance } from '../hooks/useAttendance';

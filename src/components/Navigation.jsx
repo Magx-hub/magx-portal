@@ -1,5 +1,5 @@
 import React, { Suspense, lazy } from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { HashRouter as Router, Routes, Route } from 'react-router-dom';
 import useScreenSize from '../hooks/useScreenSize';
 import BottomNav from './BottomNav';
 import SideNav from './SideNav';

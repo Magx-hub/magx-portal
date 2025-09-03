@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Calculator, BarChart3 } from 'lucide-react';
 import { useAllowance } from '../hooks/useAllowance';
 import AllowanceDashboard from '../components/allowance/AllowanceDashboard';

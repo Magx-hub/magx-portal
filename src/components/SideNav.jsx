@@ -1,4 +1,3 @@
-import React from 'react';
 import { NavLink } from 'react-router-dom';
 import { House, Users, Calendar, WalletCards, ForkKnife } from 'lucide-react';
 

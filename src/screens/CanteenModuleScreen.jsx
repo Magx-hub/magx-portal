@@ -1,5 +1,5 @@
 
-import React, { useState, useMemo } from 'react';
+import { useState } from 'react';
 import { useCanteenDashboard, useFeeStructures, useCanteenReports, usePaymentProcessor } from '../hooks/useCanteen';
 import { useStudents } from '../hooks/useStudents';
 import { Plus, Edit, Trash2, Search, Download, BarChart, PieChart, DollarSign, Users, BookOpen, X } from 'lucide-react';

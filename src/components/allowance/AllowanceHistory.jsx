@@ -1,5 +1,5 @@
 
-import React, { useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { History, Search } from 'lucide-react';
 
 const AllowanceHistory = ({ allowances, loading }) => {
