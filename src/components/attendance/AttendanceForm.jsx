@@ -7,6 +7,15 @@ const AttendanceForm = ({ form, setForm, teachers, handleAdd }) => {
     <div className="border-t border-gray-200 pt-4 mt-4 animate-in slide-in-from-top-2">
       <h3 className="text-md font-medium text-gray-800 mb-3">Mark Attendance</h3>
       <div className="space-y-3">
+        <input
+          type="number"
+          value={form.weekNum || ''}
+          onChange={(e) => setForm({ ...form, weekNum: e.target.value })}
+          className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          placeholder="Week Number"
+          min={1}
+          max={53}
+        />
         <select 
           value={form.teacherId} 
           onChange={(e) => setForm({ ...form, teacherId: e.target.value })} 
@@ -43,7 +52,7 @@ const AttendanceForm = ({ form, setForm, teachers, handleAdd }) => {
           <option value="late">Late</option>
           <option value="half-day">Half Day</option>
         </select>
-        
+
         <input 
           type="text" 
           value={form.remarks} 

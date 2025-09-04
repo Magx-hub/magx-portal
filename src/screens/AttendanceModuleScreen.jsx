@@ -16,7 +16,7 @@ const AttendanceModuleScreen = () => {
   const { teachers } = useTeachers();
   const [date, setDate] = useState(() => new Date().toISOString().slice(0, 10));
   const [search, setSearch] = useState('');
-  const [form, setForm] = useState({ teacherId: '', checkInTime: '', checkOutTime: '', status: 'present', remarks: '' });
+  const [form, setForm] = useState({ weekNum: '', teacherId: '', checkInTime: '', checkOutTime: '', status: 'present', remarks: '' });
   const [showAddForm, setShowAddForm] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
   const [activeView, setActiveView] = useState('records'); // 'records' or 'analytics'

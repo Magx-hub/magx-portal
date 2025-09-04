@@ -1,6 +1,13 @@
 import { useCallback, useMemo, useState } from 'react';
-import { submitAttendanceRecord, updateAttendanceRecordById, fetchAttendanceByDate, fetchAttendanceByTeacherRange, computeDailyStats, computeWeeklyStats } from '../services/attendanceFirebaseService';
-import { getAttendanceByDateRange } from '../services/firebaseService';
+import { 
+  submitAttendanceRecord, 
+  updateAttendanceRecordById, 
+  fetchAttendanceByDate, 
+  fetchAttendanceByTeacherRange, 
+  computeDailyStats, 
+  computeWeeklyStats,
+  getAttendanceByDateRange
+} from '../services/attendanceService';
 import { calculateAcademicWeek } from '../utils/attendanceUtils';
 
 export const useAttendance = () => {
@@ -98,6 +105,14 @@ export const useAttendance = () => {
     updateFilters,
     stats,
     getWeekNumber,
+    // Expose all attendanceService functions for full implementation
+    submitAttendanceRecord,
+    updateAttendanceRecordById,
+    fetchAttendanceByDate,
+    fetchAttendanceByTeacherRange,
+    computeDailyStats,
+    computeWeeklyStats,
+    getAttendanceByDateRange
   };
 };
 
@@ -127,4 +142,3 @@ export const useAttendance = () => {
 //     console.error("Error adding document: ", e);
 //   }
 // };
-

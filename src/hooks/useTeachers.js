@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect } from 'react';
-import * as firebaseService from '../services/firebaseService';
+import * as teacherService from '../services/teacherService';
 
 export const useTeachers = () => {
   const [teachers, setTeachers] = useState([]);
@@ -22,7 +22,7 @@ export const useTeachers = () => {
   }, []);
 
   const fetchTeachers = useCallback(async () => {
-    const data = await handleAsync(firebaseService.getTeachers);
+    const data = await handleAsync(teacherService.getTeachers);
     if (data) {
       setTeachers(data);
     }
@@ -30,7 +30,7 @@ export const useTeachers = () => {
 
   const addTeacher = useCallback(async (teacherData) => {
     const newTeacherId = await handleAsync(() => 
-      firebaseService.addTeacher(teacherData)
+      teacherService.addTeacher(teacherData)
     );
     if (newTeacherId) {
       await fetchTeachers(); // Refresh the list
@@ -40,7 +40,7 @@ export const useTeachers = () => {
 
   const updateTeacher = useCallback(async (id, teacherData) => {
     const success = await handleAsync(() => 
-      firebaseService.updateTeacher(id, teacherData)
+      teacherService.updateTeacher(id, teacherData)
     );
     if (success) {
       await fetchTeachers(); // Refresh the list
@@ -50,7 +50,7 @@ export const useTeachers = () => {
 
   const deleteTeacher = useCallback(async (id) => {
     const success = await handleAsync(() => 
-      firebaseService.deleteTeacher(id)
+      teacherService.deleteTeacher(id)
     );
     if (success) {
       setTeachers(prev => prev.filter(t => t.id !== id));
@@ -65,7 +65,7 @@ export const useTeachers = () => {
     }
     
     const data = await handleAsync(() => 
-      firebaseService.searchTeachers(searchTerm)
+      teacherService.searchTeachers(searchTerm)
     );
     if (data) {
       setTeachers(data);
@@ -73,7 +73,7 @@ export const useTeachers = () => {
   }, [handleAsync, fetchTeachers]);
 
   const fetchTeacherStats = useCallback(async () => {
-    const data = await handleAsync(firebaseService.getTeacherStats);
+    const data = await handleAsync(teacherService.getTeacherStats);
     if (data) {
       setStats(data);
     }
