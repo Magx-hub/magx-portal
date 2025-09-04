@@ -45,6 +45,21 @@ export const getTeachers = async () => {
   }
 };
 
+
+export const getAllTeachers = async () => {
+  try {
+    const q = query(collection(db, 'teachers'), orderBy('fullname', 'asc'));
+    const querySnapshot = await getDocs(q);
+    return querySnapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data()
+    }));
+  } catch (error) {
+    console.error('Error getting teachers:', error);
+    throw error;
+  }
+};
+
 export const getTeacherById = async (id) => {
   try {
     const docRef = doc(db, 'teachers', id);

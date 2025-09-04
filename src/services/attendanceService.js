@@ -16,7 +16,7 @@ import {
 } from 'firebase/firestore';
 import { db } from '../firebase/config';
 import { calculateWorkHours } from '../utils/helpers';
-import { getAllTeachers } from './firebaseService';
+import { getAllTeachers } from './teacherService';
 
 // Collection reference
 const COLLECTION_NAME = 'attendance';
