@@ -2,7 +2,7 @@ import React, { Suspense } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { Users, Calendar, WalletCards, ForkKnife, BarChart3, GraduationCap } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
-import { useScreenSize } from '../hooks/useScreenSize';
+import useScreenSize from '../hooks/useScreenSize';
 import EnhancedSideNav from './EnhancedSideNav';
 import EnhancedBottomNav from './EnhancedBottomNav';
 import ProtectedRoute from './ProtectedRoute';
