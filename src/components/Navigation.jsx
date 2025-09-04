@@ -16,7 +16,7 @@ const StudentModuleScreen = React.lazy(() => import('../screens/StudentModuleScr
 const AttendanceModuleScreen = React.lazy(() => import('../screens/AttendanceModuleScreen'));
 const AllowanceModuleScreen = React.lazy(() => import('../screens/AllowanceModuleScreen'));
 const CanteenModuleScreen = React.lazy(() => import('../screens/CanteenModuleScreen'));
-const PerformanceScreen = React.lazy(() => import('../screens/PerformanceScreen'));
+const PerformanceScreen = React.lazy(() => import('../screens/PerformanceMonitor'));
 
 const Navigation = () => {
   const { width } = useScreenSize();
