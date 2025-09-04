@@ -1,4 +1,3 @@
-
 import { 
   collection, 
   addDoc, 
@@ -12,10 +11,12 @@ import {
   limit, 
   startAfter,
   getDoc,
-  serverTimestamp
+  serverTimestamp,
+  writeBatch
 } from 'firebase/firestore';
 import { db } from '../firebase/config';
 import { calculateWorkHours } from '../utils/helpers';
+import { getAllTeachers } from './firebaseService';
 
 // Collection reference
 const COLLECTION_NAME = 'attendance';
@@ -208,16 +209,35 @@ export const getTeacherAttendanceSummary = async (teacherId, month, year) => {
   }
 };
 
-export const getAllTeachersAttendanceSummary = async (month, year) => {
+export const getAllTeachersAttendanceSummary = async (month = null, year = null) => {
   try {
+    // Use current month/year if not provided
+    const now = new Date();
+    const targetMonth = month || (now.getMonth() + 1);
+    const targetYear = year || now.getFullYear();
+    
     const teachers = await getAllTeachers();
-    const summaries = await Promise.all(teachers.map(teacher => 
-      getTeacherAttendanceSummary(teacher.id, month, year)
-    ));
-    return summaries;
+    
+    if (!teachers || teachers.length === 0) {
+      return [];
+    }
+    
+    const summaries = await Promise.all(
+      teachers.map(async (teacher) => {
+        const summary = await getTeacherAttendanceSummary(teacher.id, targetMonth, targetYear);
+        return {
+          id: teacher.id,
+          fullname: teacher.fullname || teacher.name || 'Unknown',
+          department: teacher.department || 'Unknown',
+          ...summary
+        };
+      })
+    );
+    
+    return summaries.filter(summary => summary.totalDays > 0); // Only return teachers with attendance data
   } catch (error) {
     console.error('Error getting all teachers attendance summary:', error);
-    throw error;
+    return []; // Return empty array instead of throwing
   }
 };
 

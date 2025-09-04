@@ -17,6 +17,7 @@ const EnhancedAttendanceForm = ({
     checkInTime: '',
     checkOutTime: '',
     status: 'Present',
+    weekNum: 1,
     remarks: ''
   });
   const [errors, setErrors] = useState({});
@@ -31,6 +32,7 @@ const EnhancedAttendanceForm = ({
         checkInTime: editingRecord.checkInTime || '',
         checkOutTime: editingRecord.checkOutTime || '',
         status: editingRecord.status || 'Present',
+        weekNum: editingRecord.weekNum || 1,
         remarks: editingRecord.remarks || ''
       });
     } else {
@@ -41,6 +43,7 @@ const EnhancedAttendanceForm = ({
         checkInTime: '',
         checkOutTime: '',
         status: 'Present',
+        weekNum: 1,
         remarks: ''
       });
     }
@@ -104,6 +107,15 @@ const EnhancedAttendanceForm = ({
         }
         break;
       
+      case 'weekNum':
+        const weekNumber = parseInt(value);
+        if (!weekNumber || weekNumber < 1 || weekNumber > 16) {
+          newErrors.weekNum = 'Week number must be between 1 and 16';
+        } else {
+          delete newErrors.weekNum;
+        }
+        break;
+      
       default:
         break;
     }
@@ -147,6 +159,7 @@ const EnhancedAttendanceForm = ({
       const submissionData = {
         ...formData,
         workHours,
+        weekNum: parseInt(formData.weekNum),
         updatedAt: new Date().toISOString()
       };
 
@@ -225,21 +238,51 @@ const EnhancedAttendanceForm = ({
             )}
           </div>
 
-          {/* Date */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              <Calendar size={16} className="inline mr-1" />
-              Date *
-            </label>
-            <Input
-              type="date"
-              name="date"
-              value={formData.date}
-              onChange={handleInputChange}
-              error={errors.date}
-              disabled={loading}
-              max={new Date().toISOString().split('T')[0]}
-            />
+          {/* Date and Week Number */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                <Calendar size={16} className="inline mr-1" />
+                Date *
+              </label>
+              <Input
+                type="date"
+                name="date"
+                value={formData.date}
+                onChange={handleInputChange}
+                error={errors.date}
+                disabled={loading}
+                max={new Date().toISOString().split('T')[0]}
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Academic Week *
+              </label>
+              <select
+                name="weekNum"
+                value={formData.weekNum}
+                onChange={handleInputChange}
+                className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                  errors.weekNum ? 'border-red-300 bg-red-50' : 'border-gray-300'
+                }`}
+                disabled={loading}
+                aria-describedby={errors.weekNum ? 'weekNum-error' : undefined}
+              >
+                {Array.from({ length: 16 }, (_, i) => i + 1).map(week => (
+                  <option key={week} value={week}>
+                    Week {week}
+                  </option>
+                ))}
+              </select>
+              {errors.weekNum && (
+                <p id="weekNum-error" className="mt-1 text-sm text-red-600 flex items-center gap-1">
+                  <AlertCircle size={14} />
+                  {errors.weekNum}
+                </p>
+              )}
+            </div>
           </div>
 
           {/* Time Inputs */}

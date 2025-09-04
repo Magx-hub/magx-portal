@@ -9,13 +9,13 @@ import { calculateWorkHours, determineStatus, calculateAcademicWeek, sanitizeInp
 
 // Wrapper ensuring consistent field shapes and calculations used by UI/hook
 
-export const submitAttendanceRecord = async ({ teacherId, date, checkInTime, checkOutTime, status, remarks }) => {
+export const submitAttendanceRecord = async ({ teacherId, date, checkInTime, checkOutTime, status, remarks, weekNum }) => {
   const safeTeacherId = sanitizeInput(String(teacherId || ''), 'text');
   const safeDate = sanitizeInput(date || '', 'date');
   const safeCheckIn = sanitizeInput(checkInTime || '', 'time');
   const safeCheckOut = sanitizeInput(checkOutTime || '', 'time');
   const computedStatus = status || determineStatus(safeCheckIn);
-  const weekNum = calculateAcademicWeek(safeDate);
+  const finalWeekNum = weekNum || calculateAcademicWeek(safeDate); // Use provided weekNum or calculate
   const workHours = calculateWorkHours(safeCheckIn, safeCheckOut);
   
   const teacher = await getTeacherById(safeTeacherId);
@@ -23,8 +23,9 @@ export const submitAttendanceRecord = async ({ teacherId, date, checkInTime, che
   const payload = {
     teacherId: safeTeacherId,
     fullname: teacher.fullname,
+    department: teacher.department, // Add department field
     date: safeDate,
-    weekNum,
+    weekNum: finalWeekNum,
     checkInTime: safeCheckIn || null,
     checkOutTime: safeCheckOut || null,
     workHours: Number.isFinite(workHours) ? workHours : 0,
@@ -121,5 +122,3 @@ const mapRow = (row) => ({
   status: row.status,
   remarks: row.remarks || '',
 });
-
-

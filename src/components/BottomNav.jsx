@@ -12,7 +12,7 @@ const BottomNav = () => {
   ];
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 bg-blue-600 text-white flex justify-around p-2 md:hidden rounded-t-lg">
+    <div className="fixed bottom-0 left-0 right-0 bg-blue-600 text-white flex justify-around p-2 mt-2 md:hidden rounded-t-lg">
       {navItems.map((item) => (
         <NavLink
           key={item.path}
