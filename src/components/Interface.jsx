@@ -1,4 +1,4 @@
-import React from 'react';
+import PropTypes from 'prop-types';
 
 // Typography component with variant and color support
 const Typography = ({ variant = 'p', color = 'black', className = '', children, ...props }) => {
@@ -24,6 +24,13 @@ const Typography = ({ variant = 'p', color = 'black', className = '', children, 
   );
 };
 
+Typography.propTypes = {
+  variant: PropTypes.string,
+  color: PropTypes.string,
+  className: PropTypes.string,
+  children: PropTypes.node.isRequired,
+};
+
 
 // CardBody component
 const CardBody = ({ className = '', children, ...props }) => {
@@ -32,6 +39,11 @@ const CardBody = ({ className = '', children, ...props }) => {
       {children}
     </div>
   );
+};
+
+CardBody.propTypes = {
+  className: PropTypes.string,
+  children: PropTypes.node.isRequired,
 };
 
 
@@ -60,6 +72,13 @@ const Card = ({
   );
 };
 
+Card.propTypes = {
+  color: PropTypes.string,
+  shadow: PropTypes.bool,
+  className: PropTypes.string,
+  children: PropTypes.node.isRequired,
+};
+
 
 // Feature Card component that matches your specification
 const FeatureCard = ({ icon, title, children, ...cardProps }) => {
@@ -78,6 +97,12 @@ const FeatureCard = ({ icon, title, children, ...cardProps }) => {
       </CardBody>
     </Card>
   );
+};
+
+FeatureCard.propTypes = {
+  icon: PropTypes.node.isRequired,
+  title: PropTypes.string.isRequired,
+  children: PropTypes.node.isRequired,
 };
 
 

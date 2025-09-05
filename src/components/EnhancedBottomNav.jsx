@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
+import PropTypes from 'prop-types';
 import { NavLink } from 'react-router-dom';
-import { Menu, Home, MoreHorizontal } from 'lucide-react';
+import { Menu, Home } from 'lucide-react';
 import MobileDrawer from './MobileDrawer';
 
 const EnhancedBottomNav = ({ navItems }) => {
@@ -62,28 +63,29 @@ const EnhancedBottomNav = ({ navItems }) => {
           </NavLink>
 
           {/* Primary Navigation Items */}
-          {primaryNavItems.map((item) => (
-            <NavLink
-              key={item.path}
-              to={item.path}
-              className={({ isActive }) =>
-                `flex flex-col items-center justify-center p-3 rounded-xl transition-all duration-200 min-w-[60px] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
-                  isActive 
-                    ? 'bg-blue-100 text-blue-600' 
-                    : 'text-gray-600 hover:text-blue-600 hover:bg-blue-50'
-                }`
-              }
-              aria-current={({ isActive }) => isActive ? 'page' : undefined}
-              aria-label={`Go to ${item.name.toLowerCase()}`}
-            >
-              <div className="w-5 h-5" aria-hidden="true">
-                {item.icon}
-              </div>
-              <span className="text-xs mt-1 font-medium truncate max-w-[50px]">
-                {item.name}
-              </span>
-            </NavLink>
-          ))}
+          {primaryNavItems.slice(1).map((item) => {
+            const IconComponent = item.icon;
+            return (
+              <NavLink
+                key={item.path}
+                to={item.path}
+                className={({ isActive }) =>
+                  `flex flex-col items-center justify-center p-3 rounded-xl transition-all duration-200 min-w-[60px] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
+                    isActive 
+                      ? 'bg-blue-100 text-blue-600' 
+                      : 'text-gray-600 hover:text-blue-600 hover:bg-blue-50'
+                  }`
+                }
+                aria-current={({ isActive }) => isActive ? 'page' : undefined}
+                aria-label={`Go to ${item.label.toLowerCase()}`}
+              >
+                <IconComponent size={20} aria-hidden="true" />
+                <span className="text-xs mt-1 font-medium truncate max-w-[50px]">
+                  {item.label}
+                </span>
+              </NavLink>
+            );
+          })}
 
           {/* More/Menu Button */}
           {hasMoreItems && (
@@ -116,6 +118,14 @@ const EnhancedBottomNav = ({ navItems }) => {
       <div className="h-20 md:hidden" aria-hidden="true" />
     </>
   );
+};
+
+EnhancedBottomNav.propTypes = {
+  navItems: PropTypes.arrayOf(PropTypes.shape({
+    path: PropTypes.string.isRequired,
+    label: PropTypes.string.isRequired,
+    icon: PropTypes.elementType.isRequired,
+  })).isRequired,
 };
 
 export default EnhancedBottomNav;

@@ -1,4 +1,6 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
+import PropTypes from 'prop-types';
+import PropTypes from 'prop-types';
 import { Users, GraduationCap, Clock, DollarSign, Coffee, Menu, Bell, Search } from 'lucide-react';
 import { Card } from './ui';
 
@@ -6,44 +8,44 @@ const MobileTabLayout = ({ children, defaultTab = 'dashboard' }) => {
   const [activeTab, setActiveTab] = useState(defaultTab);
 
   const tabs = [
-    { 
-      id: 'dashboard', 
-      label: 'Dashboard', 
+    {
+      id: 'dashboard',
+      label: 'Dashboard',
       icon: Menu,
       title: 'MagX Portal Dashboard',
-      subtitle: 'Welcome back! Here\'s your overview'
+      subtitle: "Welcome back! Here's your overview"
     },
-    { 
-      id: 'teachers', 
-      label: 'Teachers', 
+    {
+      id: 'teachers',
+      label: 'Teachers',
       icon: GraduationCap,
       title: 'Teacher Management',
       subtitle: 'Manage faculty and staff members'
     },
-    { 
-      id: 'students', 
-      label: 'Students', 
+    {
+      id: 'students',
+      label: 'Students',
       icon: Users,
-      title: 'Student Management', 
+      title: 'Student Management',
       subtitle: 'Manage student records and enrollment'
     },
-    { 
-      id: 'attendance', 
-      label: 'Attendance', 
+    {
+      id: 'attendance',
+      label: 'Attendance',
       icon: Clock,
       title: 'Attendance System',
       subtitle: 'Track and manage daily attendance'
     },
-    { 
-      id: 'allowance', 
-      label: 'Allowance', 
+    {
+      id: 'allowance',
+      label: 'Allowance',
       icon: DollarSign,
       title: 'Allowance Management',
       subtitle: 'Process student allowances and payments'
     },
-    { 
-      id: 'canteen', 
-      label: 'Canteen', 
+    {
+      id: 'canteen',
+      label: 'Canteen',
       icon: Coffee,
       title: 'Canteen System',
       subtitle: 'Manage meals and canteen operations'
@@ -107,8 +109,7 @@ const MobileTabLayout = ({ children, defaultTab = 'dashboard' }) => {
                   <button
                     key={tab.id}
                     onClick={() => handleTabChange(tab.id)}
-                    className={`flex-1 min-w-0 px-3 py-2.5 text-sm font-medium transition-all duration-200 rounded-md ${
-                      activeTab === tab.id
+                    className={`flex-1 min-w-0 px-3 py-2.5 text-sm font-medium transition-all duration-200 rounded-md ${activeTab === tab.id
                         ? 'bg-white text-blue-600 shadow-sm ring-1 ring-blue-200'
                         : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
                     }`}
@@ -218,6 +219,11 @@ const MobileTabLayout = ({ children, defaultTab = 'dashboard' }) => {
       </div>
     </div>
   );
+};
+
+MobileTabLayout.propTypes = {
+  children: PropTypes.node,
+  defaultTab: PropTypes.string,
 };
 
 export default MobileTabLayout;

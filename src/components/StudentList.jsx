@@ -1,3 +1,5 @@
+import PropTypes from 'prop-types';
+
 const StudentList = ({ students, loading, error, onEdit, onDelete }) => {
   if (loading) {
     return (
@@ -55,6 +57,19 @@ const StudentList = ({ students, loading, error, onEdit, onDelete }) => {
       ))}
     </ul>
   );
+};
+
+StudentList.propTypes = {
+  students: PropTypes.arrayOf(PropTypes.shape({
+    id: PropTypes.string,
+    fullname: PropTypes.string,
+    department: PropTypes.string,
+    gender: PropTypes.string,
+  })).isRequired,
+  loading: PropTypes.bool.isRequired,
+  error: PropTypes.string,
+  onEdit: PropTypes.func.isRequired,
+  onDelete: PropTypes.func.isRequired,
 };
 
 export default StudentList;

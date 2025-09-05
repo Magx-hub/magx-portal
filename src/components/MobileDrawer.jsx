@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import { useEffect } from 'react';
+import PropTypes from 'prop-types';
 import { NavLink } from 'react-router-dom';
-import { X, Menu, Users, Calendar, WalletCards, ForkKnife, BarChart3, GraduationCap, LogOut } from 'lucide-react';
+import { X, LogOut } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 
 const MobileDrawer = ({ isOpen, onClose, navItems }) => {
@@ -120,24 +121,25 @@ const MobileDrawer = ({ isOpen, onClose, navItems }) => {
         {/* Navigation Items */}
         <nav className="flex-1 px-4 py-6" role="navigation" aria-label="Main navigation">
           <div className="space-y-2">
-            {navItems.map((item) => (
-              <NavLink
-                key={item.path}
-                to={item.path}
-                onClick={handleNavClick}
-                className={({ isActive }) =>
-                  `flex items-center px-4 py-3 rounded-xl text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
-                    isActive ? 'bg-blue-100 text-blue-600 font-medium' : ''
-                  }`
-                }
-                aria-current={({ isActive }) => isActive ? 'page' : undefined}
-              >
-                <div className="w-6 h-6 mr-4 flex-shrink-0" aria-hidden="true">
-                  {item.icon}
-                </div>
-                <span className="text-base">{item.name}</span>
-              </NavLink>
-            ))}
+            {navItems.map((item) => {
+              const IconComponent = item.icon;
+              return (
+                <NavLink
+                  key={item.path}
+                  to={item.path}
+                  onClick={handleNavClick}
+                  className={({ isActive }) =>
+                    `flex items-center px-4 py-3 rounded-xl text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
+                      isActive ? 'bg-blue-100 text-blue-600 font-medium' : ''
+                    }`
+                  }
+                  aria-current={({ isActive }) => isActive ? 'page' : undefined}
+                >
+                  <IconComponent size={24} className="mr-4 flex-shrink-0" aria-hidden="true" />
+                  <span className="text-base">{item.label}</span>
+                </NavLink>
+              );
+            })}
           </div>
         </nav>
 
@@ -155,6 +157,16 @@ const MobileDrawer = ({ isOpen, onClose, navItems }) => {
       </div>
     </>
   );
+};
+
+MobileDrawer.propTypes = {
+  isOpen: PropTypes.bool.isRequired,
+  onClose: PropTypes.func.isRequired,
+  navItems: PropTypes.arrayOf(PropTypes.shape({
+    path: PropTypes.string.isRequired,
+    label: PropTypes.string.isRequired,
+    icon: PropTypes.elementType.isRequired,
+  })).isRequired,
 };
 
 export default MobileDrawer;

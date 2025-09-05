@@ -9,11 +9,12 @@ export const teachers = {
   "Jennifer Apprey": "jenny4kg",
   "Elizabeth Kwakye": "iamnowinb5",
   "Marjorie Tagoe": "datgagirl",
-  "Michael Ofosu": "iteach@basic4"
+  "Michael Ofosu": "iteach@basic4",
+  "Madam Judith": "judith@nursery"
 };
 
 // Admin credentials
 export const adminCredentials = {
-  username: "master",
-  password: "grantmeaccess"
+  username: "magmax",
+  password: "mec-admin@2025"
 };

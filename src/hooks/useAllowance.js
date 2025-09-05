@@ -229,7 +229,6 @@ export const useAllowanceRecord = (id) => {
   return {
     record,
     loading,
-    error,
     refetch: fetchRecord
   };
 };

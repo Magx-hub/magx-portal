@@ -231,7 +231,6 @@ export const useStudentStats = () => {
   return {
     ...stats,
     loading,
-    error,
     refreshStats
   };
 };

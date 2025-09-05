@@ -121,12 +121,12 @@ const StudentModuleScreen = () => {
   return (
     <div className="container mx-auto p-6 max-w-6xl">
       <header className="flex justify-between items-center mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">Student Management</h1>
+        <h1 className="text-2xl font-bold text-gray-900">Student Management</h1>
         <button 
           className="px-4 py-2 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors"
           onClick={() => setShowForm(true)}
         >
-          Add New Student
+          Add New
         </button>
       </header>
 

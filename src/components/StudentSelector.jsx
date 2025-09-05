@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
+import PropTypes from 'prop-types';
 import { useStudentSearch } from '../hooks/useStudents';
 
 const StudentSelector = ({ onSelect, selectedStudent, placeholder = "Search and select a student..." }) => {
@@ -108,6 +109,15 @@ const StudentSelector = ({ onSelect, selectedStudent, placeholder = "Search and 
       )}
     </div>
   );
+};
+
+StudentSelector.propTypes = {
+  onSelect: PropTypes.func.isRequired,
+  selectedStudent: PropTypes.shape({
+    id: PropTypes.string,
+    fullname: PropTypes.string,
+  }),
+  placeholder: PropTypes.string,
 };
 
 export default StudentSelector;

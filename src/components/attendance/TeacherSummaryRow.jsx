@@ -1,9 +1,10 @@
-
 import React from 'react';
+import PropTypes from 'prop-types';
 
 const TeacherSummaryRow = ({ summary }) => {
-  const attendancePercentage = summary.totalDays > 0 ? ((summary.presentDays / summary.totalDays) * 100).toFixed(1) : '0.0';
-  const avgHours = summary.totalDays > 0 ? (summary.totalWorkHours / summary.presentDays).toFixed(1) : '0.0';
+  const attendanceRate = summary.totalDays > 0 
+    ? ((summary.presentDays / summary.totalDays) * 100).toFixed(1) 
+    : 0;
 
   return (
     <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
@@ -13,7 +14,7 @@ const TeacherSummaryRow = ({ summary }) => {
           <p className="text-sm text-gray-600">{summary.department}</p>
         </div>
         <span className={`px-2 py-1 rounded-full text-xs font-medium`}>
-          {attendancePercentage}%
+          {attendanceRate}%
         </span>
       </div>
       
@@ -33,6 +34,18 @@ const TeacherSummaryRow = ({ summary }) => {
       </div>
     </div>
   );
+};
+
+TeacherSummaryRow.propTypes = {
+  summary: PropTypes.shape({
+    fullname: PropTypes.string.isRequired,
+    department: PropTypes.string.isRequired,
+    totalDays: PropTypes.number.isRequired,
+    presentDays: PropTypes.number.isRequired,
+    absentCount: PropTypes.number.isRequired,
+    lateCount: PropTypes.number.isRequired,
+    totalWorkHours: PropTypes.number.isRequired,
+  }).isRequired,
 };
 
 export default TeacherSummaryRow;

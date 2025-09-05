@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import PropTypes from 'prop-types';
 import { useStudents } from '../hooks/useStudents';
 
 const StudentForm = ({ student, onClose, onSave }) => {
@@ -126,6 +127,17 @@ const StudentForm = ({ student, onClose, onSave }) => {
       </div>
     </div>
   );
+};
+
+StudentForm.propTypes = {
+  student: PropTypes.shape({
+    id: PropTypes.string,
+    fullname: PropTypes.string,
+    department: PropTypes.string,
+    gender: PropTypes.string,
+  }),
+  onClose: PropTypes.func.isRequired,
+  onSave: PropTypes.func.isRequired,
 };
 
 export default StudentForm;

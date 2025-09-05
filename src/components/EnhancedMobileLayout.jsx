@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
+import PropTypes from 'prop-types';
 import { Users, GraduationCap, Clock, DollarSign, Coffee, Menu, Bell, Search, Home } from 'lucide-react';
 import { Card, Button, Input } from './ui';
-import { useScreenSize } from '../hooks/useScreenSize';
+import useScreenSize from '../hooks/useScreenSize';
 
 const EnhancedMobileLayout = ({ 
   children, 
@@ -17,7 +18,7 @@ const EnhancedMobileLayout = ({
   const isMobile = width < 768;
 
   const defaultTabs = [
-    { 
+    {
       id: 'dashboard', 
       label: 'Dashboard', 
       icon: Home,
@@ -25,7 +26,7 @@ const EnhancedMobileLayout = ({
       subtitle: 'Welcome back! Here\'s your overview',
       color: 'from-blue-500 to-blue-600'
     },
-    { 
+    {
       id: 'teachers', 
       label: 'Teachers', 
       icon: GraduationCap,
@@ -33,7 +34,7 @@ const EnhancedMobileLayout = ({
       subtitle: 'Manage faculty and staff members',
       color: 'from-green-500 to-green-600'
     },
-    { 
+    {
       id: 'students', 
       label: 'Students', 
       icon: Users,
@@ -41,7 +42,7 @@ const EnhancedMobileLayout = ({
       subtitle: 'Manage student records and enrollment',
       color: 'from-purple-500 to-purple-600'
     },
-    { 
+    {
       id: 'attendance', 
       label: 'Attendance', 
       icon: Clock,
@@ -49,7 +50,7 @@ const EnhancedMobileLayout = ({
       subtitle: 'Track and manage daily attendance',
       color: 'from-indigo-500 to-indigo-600'
     },
-    { 
+    {
       id: 'allowance', 
       label: 'Allowance', 
       icon: DollarSign,
@@ -57,7 +58,7 @@ const EnhancedMobileLayout = ({
       subtitle: 'Process student allowances and payments',
       color: 'from-orange-500 to-orange-600'
     },
-    { 
+    {
       id: 'canteen', 
       label: 'Canteen', 
       icon: Coffee,
@@ -119,7 +120,7 @@ const EnhancedMobileLayout = ({
             <div className="flex items-center gap-3 mb-2">
               {currentTab?.icon && (
                 <div className={`w-10 h-10 bg-gradient-to-r ${currentTab.color || 'from-blue-500 to-blue-600'} rounded-lg flex items-center justify-center`}>
-                  <currentTab.icon size={20} className="text-white" />
+                  {React.createElement(currentTab.icon, { size: 20, className: "text-white" })}
                 </div>
               )}
               <div className="flex-1 min-w-0">
@@ -170,7 +171,7 @@ const EnhancedMobileLayout = ({
                     <button
                       key={tab.id}
                       onClick={() => handleTabChange(tab.id)}
-                      className={`flex-1 min-w-0 px-3 py-2.5 text-sm font-medium transition-all duration-200 rounded-md ${
+                      className={`flex-1 min-w-0 px-3 py-2.5 text-sm font-medium transition-all duration-200 rounded-md ${ 
                         activeTab === tab.id
                           ? 'bg-white text-blue-600 shadow-sm ring-1 ring-blue-200'
                           : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
@@ -179,7 +180,7 @@ const EnhancedMobileLayout = ({
                       aria-label={`Switch to ${tab.label}`}
                     >
                       <div className="flex flex-col items-center gap-1">
-                        <IconComponent size={18} />
+                        {React.createElement(IconComponent, { size: 18 })}
                         <span className="truncate text-xs leading-tight">{tab.label}</span>
                       </div>
                     </button>
@@ -193,7 +194,7 @@ const EnhancedMobileLayout = ({
                     aria-label="More options"
                   >
                     <div className="flex flex-col items-center gap-1">
-                      <Menu size={18} />
+                      {React.createElement(Menu, { size: 18 })}
                       <span className="text-xs">More</span>
                     </div>
                   </button>
@@ -217,7 +218,7 @@ const EnhancedMobileLayout = ({
                     <p className="text-2xl font-bold">1,234</p>
                   </div>
                   <div className="w-10 h-10 bg-white bg-opacity-20 rounded-lg flex items-center justify-center">
-                    {currentTab?.icon && <currentTab.icon size={20} />}
+                    {currentTab?.icon && React.createElement(currentTab.icon, { size: 20 })}
                   </div>
                 </div>
               </Card>
@@ -229,7 +230,7 @@ const EnhancedMobileLayout = ({
                     <p className="text-2xl font-bold">987</p>
                   </div>
                   <div className="w-10 h-10 bg-white bg-opacity-20 rounded-lg flex items-center justify-center">
-                    <Users size={20} />
+                    {React.createElement(Users, { size: 20 })}
                   </div>
                 </div>
               </Card>
@@ -241,7 +242,7 @@ const EnhancedMobileLayout = ({
                     <p className="text-2xl font-bold">156</p>
                   </div>
                   <div className="w-10 h-10 bg-white bg-opacity-20 rounded-lg flex items-center justify-center">
-                    <Clock size={20} />
+                    {React.createElement(Clock, { size: 20 })}
                   </div>
                 </div>
               </Card>
@@ -253,7 +254,7 @@ const EnhancedMobileLayout = ({
                     <p className="text-2xl font-bold">23</p>
                   </div>
                   <div className="w-10 h-10 bg-white bg-opacity-20 rounded-lg flex items-center justify-center">
-                    <DollarSign size={20} />
+                    {React.createElement(DollarSign, { size: 20 })}
                   </div>
                 </div>
               </Card>
@@ -268,7 +269,7 @@ const EnhancedMobileLayout = ({
               <Card className="p-6">
                 <div className="text-center py-12">
                   <div className={`w-16 h-16 bg-gradient-to-r ${currentTab?.color || 'from-gray-100 to-gray-200'} rounded-full flex items-center justify-center mx-auto mb-4`}>
-                    {currentTab?.icon && <currentTab.icon size={32} className="text-white" />}
+                    {currentTab?.icon && React.createElement(currentTab.icon, { size: 32, className: "text-white" })}
                   </div>
                   <h3 className="text-lg font-semibold text-gray-900 mb-2">
                     {currentTab?.title}
@@ -300,6 +301,16 @@ const EnhancedMobileLayout = ({
       )}
     </div>
   );
+};
+
+EnhancedMobileLayout.propTypes = {
+  children: PropTypes.node.isRequired,
+  defaultTab: PropTypes.string,
+  onTabChange: PropTypes.func,
+  customTabs: PropTypes.array,
+  showStats: PropTypes.bool,
+  showSearch: PropTypes.bool,
+  showNotifications: PropTypes.bool,
 };
 
 export default EnhancedMobileLayout;

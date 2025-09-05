@@ -185,7 +185,7 @@ export const generateWeeklyPdf = async (weekNumber, setLoadingState) => {
     a.href = url;
     a.download = `weekly-report-week-${weekNumber}-${new Date().toISOString().split('T')[0]}.html`;
     document.body.appendChild(a);
-a.click();
+    a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
 

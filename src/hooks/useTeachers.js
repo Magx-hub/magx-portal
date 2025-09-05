@@ -87,7 +87,6 @@ export const useTeachers = () => {
   return {
     teachers,
     loading,
-    error,
     stats,
     fetchTeachers,
     addTeacher,

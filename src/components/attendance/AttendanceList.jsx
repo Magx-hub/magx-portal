@@ -1,12 +1,14 @@
-
-import React from 'react';
+import PropTypes from 'prop-types';
 import { Users } from 'lucide-react';
 
 const AttendanceList = ({ filtered, loading, error, getStatusColor }) => {
   return (
     <div className="bg-white rounded-xl shadow-sm p-4">
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-lg font-semibold text-gray-900">Today's Records</h2>
+        <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+          <Users size={20} />
+          Today&apos;s Attendance
+        </h3>
       </div>
       
       {loading ? (
@@ -58,6 +60,13 @@ const AttendanceList = ({ filtered, loading, error, getStatusColor }) => {
       )}
     </div>
   );
+};
+
+AttendanceList.propTypes = {
+  filtered: PropTypes.arrayOf(PropTypes.object).isRequired,
+  loading: PropTypes.bool.isRequired,
+  error: PropTypes.string,
+  getStatusColor: PropTypes.func.isRequired,
 };
 
 export default AttendanceList;

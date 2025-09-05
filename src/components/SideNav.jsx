@@ -1,34 +1,45 @@
 import { NavLink } from 'react-router-dom';
 import { House, Users, Calendar, WalletCards, ForkKnife, PenSquare } from 'lucide-react';
+import { useAuth } from '../contexts/AuthContext';
 
-const SideNav = () => {
-  const navItems = [
-    { path: '/', icon: <House size={24} />, name: 'Dashboard' },
-    { path: '/teachers', icon: <Users size={24} />, name: 'Teachers' },
-    { path: '/students', icon: <Users size={24} />, name: 'Students' },
-    { path: '/attendance', icon: <Calendar size={24} />, name: 'Attendance' },
-    { path: '/allowance', icon: <WalletCards size={24} />, name: 'Allowance' },
-    { path: '/canteen', icon: <ForkKnife size={24} />, name: 'Canteen' },
-    { path: '/performance', icon: <PenSquare size={24} />, name: 'PerformanceMonitor' },
-  ];
+const SideNav = ({ navItems = [] }) => {
+  const { userRole } = useAuth();
+
+  const filteredNavItems = navItems.filter((item) => {
+    if (userRole === 'admin') return true;
+    if (item.path === '/teachers' || item.path === '/students' || item.path === '/attendance' || item.path === '/performance') return false;
+    return true;
+  });
 
   return (
     <div className="hidden md:flex flex-col w-64 bg-blue-600 text-white rounded-r-lg">
       <div className="p-4 font-bold text-xl">MagX Portal</div>
       <nav className="flex-1 px-2 py-4 space-y-2">
-        {navItems.map((item) => (
-          <NavLink
-            key={item.path}
-            to={item.path}
-            className={({ isActive }) =>
-              `flex items-center px-4 py-2 rounded-md ${isActive ? 'bg-blue-700' : ''}`
-            }
-          >
-            {item.icon}
-            <span className="ml-4">{item.name}</span>
-          </NavLink>
-        ))}
+        {filteredNavItems.map((item) => {
+          const IconComponent = item.icon;
+          return (
+            <NavLink
+              key={item.path}
+              to={item.path}
+              className={({ isActive }) =>
+                `flex items-center px-4 py-2 rounded-md transition-colors duration-200 hover:bg-blue-700 ${
+                  isActive ? 'bg-blue-700 shadow-md' : ''
+                }`
+              }
+            >
+              <IconComponent size={20} />
+              <span className="ml-4">{item.name}</span>
+            </NavLink>
+          );
+        })}
       </nav>
+      
+      {/* User Role Indicator */}
+      <div className="p-4 border-t border-blue-500">
+        <div className="text-xs text-blue-200 uppercase tracking-wide">
+          {userRole === 'admin' ? 'Administrator' : 'Teacher Portal'}
+        </div>
+      </div>
     </div>
   );
 };

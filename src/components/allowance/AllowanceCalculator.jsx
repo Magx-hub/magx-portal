@@ -1,5 +1,5 @@
-
 import { useState } from 'react';
+import PropTypes from 'prop-types';
 import { Calculator, Plus } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -113,8 +113,8 @@ const AllowanceCalculator = ({ addAllowance, checkWeekExists }) => {
         }
       });
       setCalculation(null);
-    } catch (error) {
-      toast.error('Failed to save calculation');
+    } catch (err) {
+      toast.error('Failed to save calculation: ' + err.message);
     }
   };
 
@@ -228,6 +228,11 @@ const AllowanceCalculator = ({ addAllowance, checkWeekExists }) => {
       </div>
     </div>
   );
+};
+
+AllowanceCalculator.propTypes = {
+  addAllowance: PropTypes.func.isRequired,
+  checkWeekExists: PropTypes.func.isRequired,
 };
 
 export default AllowanceCalculator;

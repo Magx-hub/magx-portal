@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import PropTypes from 'prop-types';
 import { Clock, TrendingUp, Calendar, PieChart } from 'lucide-react';
 import { getAllTeachersAttendanceSummary } from '../../services/attendanceService';
 import TeacherSummaryCard from './TeacherSummaryCard';
@@ -21,8 +22,8 @@ const AnalyticsView = ({ stats, getWeekNumber, date }) => {
   return (
     <div className="space-y-4">
       {/* Stats Overview */}
-      <div className="bg-white rounded-xl shadow-sm p-4">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">Today's Overview</h2>
+      <div className="bg-white rounded-xl shadow-sm p-6">
+        <h2 className="text-lg font-semibold text-gray-900 mb-4">Today&apos;s Overview</h2>
         <div className="grid grid-cols-2 gap-4">
           <div className="bg-blue-50 p-4 rounded-xl text-center border border-blue-100">
             <div className="text-2xl font-bold text-blue-600">{stats.daily.totalRecords}</div>
@@ -117,6 +118,21 @@ const AnalyticsView = ({ stats, getWeekNumber, date }) => {
       </div>
     </div>
   );
+};
+
+AnalyticsView.propTypes = {
+  stats: PropTypes.shape({
+    daily: PropTypes.shape({
+      totalRecords: PropTypes.number,
+      presentCount: PropTypes.number,
+      absentCount: PropTypes.number,
+      lateCount: PropTypes.number,
+      halfDayCount: PropTypes.number,
+      avgWorkHours: PropTypes.number,
+    }),
+  }).isRequired,
+  getWeekNumber: PropTypes.func.isRequired,
+  date: PropTypes.string.isRequired,
 };
 
 export default AnalyticsView;

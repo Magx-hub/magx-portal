@@ -95,15 +95,14 @@ export const useAttendance = () => {
   return {
     records,
     loading,
-    error,
     filters,
+    stats,
     loadByDate,
     loadByTeacherRange,
     loadByDateRange,
     saveRecord,
     updateRecord,
     updateFilters,
-    stats,
     getWeekNumber,
     // Expose all attendanceService functions for full implementation
     submitAttendanceRecord,

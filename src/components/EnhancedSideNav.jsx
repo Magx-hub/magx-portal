@@ -1,5 +1,5 @@
-import React from 'react';
 import { NavLink } from 'react-router-dom';
+import PropTypes from 'prop-types';
 import { LogOut, Home } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 
@@ -94,6 +94,15 @@ const EnhancedSideNav = ({ navItems }) => {
       </div>
     </nav>
   );
+};
+
+EnhancedSideNav.propTypes = {
+  navItems: PropTypes.arrayOf(PropTypes.shape({
+    path: PropTypes.string.isRequired,
+    name: PropTypes.string.isRequired,
+    icon: PropTypes.element.isRequired,
+    description: PropTypes.string,
+  })).isRequired,
 };
 
 export default EnhancedSideNav;

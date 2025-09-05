@@ -352,7 +352,6 @@ export const useCanteen = () => {
   return {
     // State
     loading,
-    error,
     feeStructures,
     dailyPayments,
     unpaidStudents,
