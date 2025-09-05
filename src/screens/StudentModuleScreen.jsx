@@ -119,7 +119,7 @@ const StudentModuleScreen = () => {
   };
 
   return (
-    <div className="container mx-auto p-6 max-w-6xl">
+    <div className="container mx-auto p-2 max-w-6xl">
       <header className="flex justify-between items-center mb-8">
         <h1 className="text-2xl font-bold text-gray-900">Student Management</h1>
         <button 
@@ -149,7 +149,7 @@ const StudentModuleScreen = () => {
         ))}
       </nav>
 
-      <main className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+      <main className="bg-white rounded-lg shadow-sm border border-gray-200 p-2">
         {renderTabContent()}
       </main>
 
