@@ -6,7 +6,7 @@ import { VitePWA } from 'vite-plugin-pwa'
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  base: '/magx-portal/',
+  base: '/',
   plugins: [
     react(),
     tailwindcss(),
@@ -29,8 +29,8 @@ export default defineConfig({
         background_color: '#ffffff',
         display: 'standalone',
         orientation: 'portrait',
-        scope: '/magx-portal/',
-        start_url: '/magx-portal/',
+        scope: '/',
+        start_url: '/',
         lang: 'en',
         dir: 'ltr',
         categories: ['productivity', 'education', 'utilities'],
@@ -75,6 +75,8 @@ export default defineConfig({
         globPatterns: ['**/*.{js,css,html,svg,png,ico}'],
         cleanupOutdatedCaches: true,
         clientsClaim: true,
+        navigateFallback: '/index.html',
+        navigateFallbackDenylist: [/^\/_/, /\/[^/?]+\.[^/]+$/],
         runtimeCaching: [
           // Firebase caching
           {
@@ -132,6 +134,15 @@ export default defineConfig({
   server: {
     port: 3000,
     host: true,
-    historyApiFallback: true
+    historyApiFallback: {
+      index: '/index.html'
+    }
+  },
+  preview: {
+    port: 4173,
+    host: true,
+    historyApiFallback: {
+      index: '/index.html'
+    }
   }
 })
