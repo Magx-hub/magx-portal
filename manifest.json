@@ -1,9 +1,9 @@
 {
   "name": "Magx Portal",
   "short_name": "Magx",
-  "start_url": "/",
+  "start_url": "/magx-portal/",
   "display": "standalone",
-  "scope": "/",
+  "scope": "/magx-portal/",
   "background_color": "#ffffff",
   "theme_color": "#1976d2",
   "icons": [
