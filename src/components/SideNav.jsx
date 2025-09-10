@@ -5,11 +5,8 @@ import { useAuth } from '../contexts/AuthContext';
 const SideNav = ({ navItems = [] }) => {
   const { userRole } = useAuth();
 
-  const filteredNavItems = navItems.filter((item) => {
-    if (userRole === 'admin') return true;
-    if (item.path === '/teachers' || item.path === '/students' || item.path === '/attendance' || item.path === '/performance') return false;
-    return true;
-  });
+  // Use the navItems directly since Navigation.jsx already filters based on role
+  const filteredNavItems = navItems;
 
   return (
     <div className="hidden md:flex flex-col w-64 bg-blue-600 text-white rounded-r-lg">
@@ -28,7 +25,7 @@ const SideNav = ({ navItems = [] }) => {
               }
             >
               <IconComponent size={20} />
-              <span className="ml-4">{item.name}</span>
+              <span className="ml-4">{item.label}</span>
             </NavLink>
           );
         })}

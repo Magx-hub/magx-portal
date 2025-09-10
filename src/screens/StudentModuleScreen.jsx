@@ -119,7 +119,7 @@ const StudentModuleScreen = () => {
   };
 
   return (
-    <div className="container mx-auto p-2 max-w-6xl">
+    <div className="container mx-auto max-w-6xl">
       <header className="flex justify-between items-center mb-8">
         <h1 className="text-2xl font-bold text-gray-900">Student Management</h1>
         <button 
