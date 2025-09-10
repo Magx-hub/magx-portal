@@ -8,19 +8,30 @@ const PerformanceDashboard = ({
   analytics, 
   classAverages, 
   studentComparison, 
-  onMigrateData 
+  onMigrateData,
+  onStudentSelect,
+  onDataInputClick
 }) => {
   return (
     <div className="space-y-8">
       <div className="flex justify-between items-center">
         <h2 className="text-3xl font-bold text-gray-700">Class Performance Overview</h2>
-        <Button 
-          onClick={onMigrateData}
-          variant="outline"
-          size="sm"
-        >
-          Migrate Data
-        </Button>
+        <div className="flex space-x-3">
+          <Button 
+            onClick={onDataInputClick}
+            variant="primary"
+            size="sm"
+          >
+            Add Data
+          </Button>
+          <Button 
+            onClick={onMigrateData}
+            variant="outline"
+            size="sm"
+          >
+            Sample Data
+          </Button>
+        </div>
       </div>
       
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -75,8 +86,39 @@ const PerformanceDashboard = ({
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="name" />
               <YAxis />
-              <Tooltip />
-              <Bar dataKey="average" fill="#10b981" />
+              <Tooltip 
+                cursor={{ fill: 'rgba(59, 130, 246, 0.1)' }}
+                content={({ active, payload, label }) => {
+                  if (active && payload && payload.length) {
+                    return (
+                      <div className="bg-white p-3 border rounded-lg shadow-lg">
+                        <p className="font-semibold">{label}</p>
+                        <p className="text-blue-600">
+                          Average: {payload[0].value}%
+                        </p>
+                        <p className="text-xs text-gray-500 mt-1">
+                          Click to view details
+                        </p>
+                      </div>
+                    );
+                  }
+                  return null;
+                }}
+              />
+              <Bar 
+                dataKey="average" 
+                fill="#10b981"
+                onClick={(data) => {
+                  if (data && onStudentSelect) {
+                    // Find the full student object by name
+                    const studentData = studentComparison.find(s => s.name === data.name);
+                    if (studentData && studentData.fullStudent) {
+                      onStudentSelect(studentData.fullStudent);
+                    }
+                  }
+                }}
+                style={{ cursor: 'pointer' }}
+              />
             </BarChart>
           </ResponsiveContainer>
         </div>
