@@ -486,5 +486,5 @@ magx-portal
 
 // git add .
 // git commit -m "Add student statistics component"
-// git push origin master
+// git push origin master/main
 // npm run deploy

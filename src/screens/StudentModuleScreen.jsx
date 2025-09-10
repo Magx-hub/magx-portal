@@ -7,7 +7,7 @@ import {
 } from '../hooks/useStudents';
 import StudentForm from '../components/StudentForm';
 import StudentList from '../components/StudentList';
-import StudentStats from '../components/StudentStats';
+import EnhancedStudentStats from '../components/EnhancedStudentStats';
 import StudentSearch from '../components/StudentSearch';
 
 const StudentModuleScreen = () => {
@@ -104,7 +104,7 @@ const StudentModuleScreen = () => {
         );
       case 'stats':
         return (
-          <StudentStats
+          <EnhancedStudentStats
             studentStats={studentStats}
             departmentStats={departmentStats}
             genderStats={genderStats}

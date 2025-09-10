@@ -8,7 +8,7 @@ import {
 } from '../hooks/useStudents';
 import StudentForm from '../components/StudentForm';
 import StudentList from '../components/StudentList';
-import StudentStats from '../components/StudentStats';
+import EnhancedStudentStats from '../components/EnhancedStudentStats';
 import MobileModuleLayout from '../components/MobileModuleLayout';
 import { Card, Button } from '../components/ui';
 
@@ -200,7 +200,7 @@ const EnhancedStudentModuleScreen = () => {
 
       case 'stats':
         return (
-          <StudentStats
+          <EnhancedStudentStats
             studentStats={studentStats}
             departmentStats={departmentStats}
             genderStats={genderStats}
