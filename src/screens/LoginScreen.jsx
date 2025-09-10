@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 const LoginScreen = () => {
   const [selectedRole, setSelectedRole] = useState(null);
@@ -7,6 +8,7 @@ const LoginScreen = () => {
   const [credentials, setCredentials] = useState({ username: '', password: '', name: '' });
   const [error, setError] = useState('');
   const { login, teachers } = useAuth();
+  const navigate = useNavigate();
 
   const handleRoleSelect = (role) => {
     setSelectedRole(role);
@@ -27,6 +29,9 @@ const LoginScreen = () => {
     const result = login(selectedRole, credentials);
     if (!result.success) {
       setError(result.message || 'Login failed');
+    } else {
+      // Redirect to home page after successful login
+      navigate('/', { replace: true });
     }
   };
 

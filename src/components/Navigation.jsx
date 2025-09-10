@@ -123,7 +123,13 @@ const Navigation = () => {
   const navItems = userRole === 'admin' ? adminNavItems : teacherNavItems;
 
   if (!isAuthenticated) {
-    return <LoginScreen />;
+    return (
+      <Router>
+        <Routes>
+          <Route path="*" element={<LoginScreen />} />
+        </Routes>
+      </Router>
+    );
   }
 
   return (
@@ -188,6 +194,14 @@ const Navigation = () => {
                     <ProtectedRoute allowedRoles={['admin', 'teacher']}>
                       <PerformanceScreen />
                     </ProtectedRoute>
+                  } 
+                />
+                
+                {/* Catch-all route - redirect to home */}
+                <Route 
+                  path="*" 
+                  element={
+                    userRole === 'admin' ? <Dashboard /> : <TeacherDashboard />
                   } 
                 />
               </Routes>
