@@ -8,42 +8,54 @@ const EnhancedAttendanceForm = ({
   onSubmit, 
   editingRecord = null, 
   teachers = [], 
-  loading = false 
+  loading = false,
+  getWeekNumber
 }) => {
   const { showToast } = useToast();
   const [formData, setFormData] = useState({
     teacherId: '',
-    date: new Date().toISOString().split('T')[0],
+    attendanceDate: new Date().toISOString().split('T')[0],
     checkInTime: '',
     checkOutTime: '',
     status: 'Present',
-    weekNum: 1,
+    weekNum: getWeekNumber ? getWeekNumber(new Date().toISOString().split('T')[0]) : 1,
     remarks: ''
   });
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Auto-calculate week number when date changes
+  const handleDateChange = (date) => {
+    const weekNum = getWeekNumber ? getWeekNumber(date) : formData.weekNum;
+    setFormData(prev => ({ 
+      ...prev, 
+      attendanceDate: date,
+      weekNum: weekNum
+    }));
+  };
 
   // Initialize form data when editing
   useEffect(() => {
     if (editingRecord) {
       setFormData({
         teacherId: editingRecord.teacherId || '',
-        date: editingRecord.date || new Date().toISOString().split('T')[0],
+        attendanceDate: editingRecord.date || new Date().toISOString().split('T')[0],
         checkInTime: editingRecord.checkInTime || '',
         checkOutTime: editingRecord.checkOutTime || '',
         status: editingRecord.status || 'Present',
-        weekNum: editingRecord.weekNum || 1,
+        weekNum: editingRecord.weekNum || (getWeekNumber ? getWeekNumber(editingRecord.date) : 1),
         remarks: editingRecord.remarks || ''
       });
     } else {
-      // Reset form for new record
+      // Reset form for new record with today's date and auto-calculated week
+      const today = new Date().toISOString().split('T')[0];
       setFormData({
         teacherId: '',
-        date: new Date().toISOString().split('T')[0],
+        attendanceDate: today,
         checkInTime: '',
         checkOutTime: '',
         status: 'Present',
-        weekNum: 1,
+        weekNum: getWeekNumber ? getWeekNumber(today) : 1,
         remarks: ''
       });
     }
@@ -245,22 +257,35 @@ const EnhancedAttendanceForm = ({
                 <Calendar size={16} className="inline mr-1" />
                 Date *
               </label>
-              <Input
+              <input
                 type="date"
-                name="date"
-                value={formData.date}
-                onChange={handleInputChange}
-                error={errors.date}
+                name="attendanceDate"
+                value={formData.attendanceDate}
+                onChange={(e) => handleDateChange(e.target.value)}
+                className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                  errors.attendanceDate ? 'border-red-300 bg-red-50' : 'border-gray-300'
+                }`}
                 disabled={loading}
                 max={new Date().toISOString().split('T')[0]}
+                aria-describedby={errors.attendanceDate ? 'attendanceDate-error' : undefined}
               />
+              {errors.attendanceDate && (
+                <p id="attendanceDate-error" className="mt-1 text-sm text-red-600 flex items-center gap-1">
+                  <AlertCircle size={14} />
+                  {errors.attendanceDate}
+                </p>
+              )}
             </div>
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Academic Week *
+                {getWeekNumber && (
+                  <span className="text-xs text-blue-600 ml-1">(Auto-calculated)</span>
+                )}
               </label>
-              <select
+              <input
+                type="number"
                 name="weekNum"
                 value={formData.weekNum}
                 onChange={handleInputChange}
@@ -268,14 +293,12 @@ const EnhancedAttendanceForm = ({
                   errors.weekNum ? 'border-red-300 bg-red-50' : 'border-gray-300'
                 }`}
                 disabled={loading}
+                min={1}
+                max={53}
+                placeholder="Week number (auto-calculated)"
+                title="Week number is automatically calculated based on the selected date, but can be manually adjusted if needed"
                 aria-describedby={errors.weekNum ? 'weekNum-error' : undefined}
-              >
-                {Array.from({ length: 16 }, (_, i) => i + 1).map(week => (
-                  <option key={week} value={week}>
-                    Week {week}
-                  </option>
-                ))}
-              </select>
+              />
               {errors.weekNum && (
                 <p id="weekNum-error" className="mt-1 text-sm text-red-600 flex items-center gap-1">
                   <AlertCircle size={14} />
