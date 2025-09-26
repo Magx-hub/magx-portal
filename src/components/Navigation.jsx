@@ -14,7 +14,7 @@ const TeacherDashboard = React.lazy(() => import('../screens/TeacherDashboard'))
 const TeacherModuleScreen = React.lazy(() => import('../screens/TeacherModuleScreen'));
 const StudentModuleScreen = React.lazy(() => import('../screens/StudentModuleScreen'));
 const AttendanceModuleScreen = React.lazy(() => import('../screens/AttendanceModuleScreen'));
-const AllowanceModuleScreen = React.lazy(() => import('../screens/AllowanceModuleScreen'));
+const AllowanceManager = React.lazy(() => import('../screens/AllowanceManager'));
 const CanteenModuleScreen = React.lazy(() => import('../screens/CanteenModuleScreen'));
 const PerformanceScreen = React.lazy(() => import('../screens/PerformanceMonitor'));
 
@@ -176,7 +176,7 @@ const Navigation = () => {
                   path="/allowance" 
                   element={
                     <ProtectedRoute allowedRoles={['admin']}>
-                      <AllowanceModuleScreen />
+                      <AllowanceManager />
                     </ProtectedRoute>
                   } 
                 />
